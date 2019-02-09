@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 from urllib.request import urlopen
@@ -10,13 +10,13 @@ import pandas as pd
 import urllib
 
 
-# In[3]:
+# In[2]:
 
 
 print(urllib.parse.quote('豔陽柑-豔陽柑'))
 
 
-# In[ ]:
+# In[3]:
 
 
 #def getdata(): 
@@ -30,7 +30,7 @@ df=pd.DataFrame(columns=col_name)
 stop_flag=0 
 skip_num=0 
 for j in range(0,999): 
-    url="https://data.coa.gov.tw/Service/OpenData/FromM/FarmTransData.aspx?top=1000&skip="+str(skip_num)+"&Crop=%E6%A4%B0%E5%AD%90&StartDate=101.01.01&EndDate=108.02.08&Market=%E5%8F%B0%E5%8C%97%E4%BA%8C" 
+    url="https://data.coa.gov.tw/Service/OpenData/FromM/FarmTransData.aspx?$top=1000&$skip="+str(skip_num)+"&Crop=%E6%A4%B0%E5%AD%90&StartDate=101.01.01&EndDate=108.02.08&Market=%E5%8F%B0%E5%8C%97%E4%BA%8C" 
     get = json.loads(urlopen(url).read()) 
     data = [] 
     for i in range(0,999):
@@ -40,11 +40,11 @@ for j in range(0,999):
             stop_flag=1 
             break
     data.reverse() 
-    df=pd.concat([pd.DataFrame(data), df], ignore_index=True)
+    df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
     skip_num=skip_num+1000 
     if stop_flag==1: 
         break 
-df.to_csv(r'C:\Users\admin\Desktop\Project\test.csv', encoding='utf_8_sig')
+df.to_csv("test.csv", encoding='utf_8_sig')
 
 
 # In[ ]:
