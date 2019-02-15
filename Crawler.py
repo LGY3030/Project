@@ -53,7 +53,7 @@ for a in place:
         time.sleep(3000.0/1000.0)
 
 
-# In[70]:
+# In[83]:
 
 
 import requests
@@ -76,11 +76,15 @@ for dd in date:
     soup = BeautifulSoup(resp.text)
     trs = soup.findAll('tr')
     ths = trs[2].findAll('th')
+    title=[]
+    r=[]
     for th in ths:
-        print(th.text)
+        title.append(th.text)
+    t=trs[4].findAll('td')
+    for tt in t:
+        r.append(tt.text.strip())
+    print(r)
     '''
-    title = [th.text.split(')')[1] for th in ths]
-
     for tr in trs[3:]:
         tds = tr.findAll('td')
 
