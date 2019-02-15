@@ -53,7 +53,7 @@ for a in place:
         time.sleep(3000.0/1000.0)
 
 
-# In[50]:
+# In[70]:
 
 
 import requests
@@ -64,8 +64,8 @@ import json
 import os
 
 date=[]
-for year in ['2012','2013','2014','2015','2016','2017','2018']:
-    for month in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']:
+for year in ['2012']:#,'2013','2014','2015','2016','2017','2018']:
+    for month in ['01']:#, '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']:
         date.append('-'.join([year,month]))
 a=urllib.parse.quote(urllib.parse.quote("臺北"))
 for dd in date:
@@ -74,10 +74,11 @@ for dd in date:
 
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
-
     trs = soup.findAll('tr')
-    print(trs)
     ths = trs[2].findAll('th')
+    for th in ths:
+        print(th.text)
+    '''
     title = [th.text.split(')')[1] for th in ths]
 
     for tr in trs[3:]:
@@ -89,6 +90,7 @@ for dd in date:
 
         json_data[dictionary['ObsTime']] = dictionary
     json_data.to_csv('path', encoding='utf_8_sig')  
+    '''
 
 
 # In[ ]:
