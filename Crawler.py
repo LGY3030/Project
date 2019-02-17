@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 from urllib.request import urlopen
-import json
+from bs4 import BeautifulSoup
 import pandas as pd
+import json
+import requests
 import urllib
 import time
 import csv
+import os
 
 
 # In[7]:
@@ -42,7 +45,7 @@ for a in place:
                 break 
             skip_num=skip_num+1000 
             time.sleep(2000.0/1000.0)
-        path=r"C:\Users\admin\Desktop\Project\data"+"\\"+a+"\\"+crop_name[b]+".csv"
+        path=r"C:\Users\admin\Desktop\Project\data"+"\\"+a+"\\"+"蔬果"+"\\"+crop_name[b]+".csv"
         df["date"] = pd.to_datetime(df["date"])
         df["year"] = df["date"].dt.year
         df["month"] = df["date"].dt.month
@@ -53,65 +56,55 @@ for a in place:
         time.sleep(3000.0/1000.0)
 
 
-# In[22]:
+# In[2]:
 
 
-import requests
-from time import sleep
-from bs4 import BeautifulSoup
-import csv
-import json
-import os
-
+place=["台北一","台北二","板橋區","桃農","台中","豐原","嘉義","高雄","台東","宜蘭"]
+place_name=["臺北","臺北","板橋","蘆竹","臺中","豐原","嘉義","高雄","臺東","宜蘭"]
+place_num=["466920","466920","466880","C0C620","467490","C0F9M0","467480","467440","467660","467080"]
 date=[]
-for year in ['2012']:#,'2013','2014','2015','2016','2017','2018']:
-    for month in ['01']:#, '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']:
+for year in ['2012','2013','2014','2015','2016','2017','2018']:
+    for month in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']:
         date.append('-'.join([year,month]))
-a=urllib.parse.quote(urllib.parse.quote("臺北"))
-for dd in date:
-    url="http://e-service.cwb.gov.tw/HistoryDataQuery/MonthDataController.do?command=viewMain"+"&station="+"466920"+"&stname="+a+"&datepicker="+str(dd)
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text)
-    trs = soup.findAll('tr')
-    ths = trs[2].findAll('th')
-    title=[]
-    day=1
-    data=[]
-    fdata=[]
-    for th in ths:
-        title.append(th.text)
-    title.pop(0)
-    title.append("year")
-    title.append("month")
-    title.append("day")
-    df=pd.DataFrame(columns=title)
-    for tr in trs[4:]:
-        t=tr.findAll('td')
-        for x in t:
-            data.append(x.text.strip())
-        data.pop(0)
-        data.append(str(year))
-        data.append(str(month))
-        data.append(str(day))
-        fdata.append({"測站氣壓(hPa)":data[0],"海平面氣壓(hPa)":data[1],"測站最高氣壓(hPa)":data[2],"測站最高氣壓時間(LST)":data[3],"測站最低氣壓(hPa)":data[4],"測站最低氣壓時間(LST)":data[5],"氣溫(℃)":data[6],"最高氣溫(℃)":data[7],"最高氣溫時間(LST)":data[8],"最低氣溫(℃)":data[9],"最低氣溫時間(LST)":data[10],"露點溫度(℃)":data[11],"相對溼度(%)":data[12],"最小相對溼度(%)":data[13],"最小相對溼度時間(LST)":data[14],"風速(m/s)":data[15],"風向(360degree)":data[16],"最大陣風(m/s)":data[17],"最大陣風風向(360degree)":data[18],"最大陣風風速時間(LST)":data[19],"降水量(mm)":data[20],"降水時數(hr)":data[21],"10分鐘最大降水量(mm)":data[22],"10分鐘最大降水起始時間(LST)":data[23]," 一小時最大降水量(mm)":data[24],"一小時最大降水量起始時間(LST)":data[25],"日照時數(hr)":data[26],"日照率(%)":data[27],"全天空日射量(MJ/㎡)":data[28],"能見度(km)":data[29],"A型蒸發量(mm)":data[30],"日最高紫外線指數":data[31],"日最高紫外線指數時間(LST)":data[32],"總雲量(0~10)":data[33],"year":data[34],"month":data[35],"day":data[36]})
-        df=pd.concat([pd.DataFrame(fdata), df], ignore_index=True,sort=True)
-        day=day+1
+date.append('2019-01')
+date.append('2019-02')
+for a in range(0,len(place)):
+    flag=0
+    name=urllib.parse.quote(urllib.parse.quote(place_name[a]))
+    for dd in date:
+        url="http://e-service.cwb.gov.tw/HistoryDataQuery/MonthDataController.do?command=viewMain"+"&station="+place_num[a]+"&stname="+name+"&datepicker="+str(dd)
+        resp = requests.get(url)
+        soup = BeautifulSoup(resp.text)
+        trs = soup.findAll('tr')
+        ths = trs[2].findAll('th')
+        day=1
         data=[]
         fdata=[]
-    print(df)
-    day=1
-    
-    '''
-    for tr in trs[3:]:
-        tds = tr.findAll('td')
-
-        row = [td.text.strip() for td in tds]
-
-        dictionary = mapping_two_list_to_dict(title, row)
-
-        json_data[dictionary['ObsTime']] = dictionary
-    json_data.to_csv('path', encoding='utf_8_sig')  
-    '''
+        if flag==0:
+            title=[]
+            for th in ths:
+                title.append(th.text)
+            title.pop(0)
+            title.append("year")
+            title.append("month")
+            title.append("day")
+            df=pd.DataFrame(columns=title)
+            flag=1
+        for tr in trs[4:]:
+            t=tr.findAll('td')
+            for x in t:
+                data.append(x.text.strip())
+            sp=dd.split('-')
+            data.pop(0)
+            data.append(sp[0])
+            data.append(sp[1])
+            data.append(str(day))
+            fdata.append({"測站氣壓(hPa)":data[0],"海平面氣壓(hPa)":data[1],"測站最高氣壓(hPa)":data[2],"測站最高氣壓時間(LST)":data[3],"測站最低氣壓(hPa)":data[4],"測站最低氣壓時間(LST)":data[5],"氣溫(℃)":data[6],"最高氣溫(℃)":data[7],"最高氣溫時間(LST)":data[8],"最低氣溫(℃)":data[9],"最低氣溫時間(LST)":data[10],"露點溫度(℃)":data[11],"相對溼度(%)":data[12],"最小相對溼度(%)":data[13],"最小相對溼度時間(LST)":data[14],"風速(m/s)":data[15],"風向(360degree)":data[16],"最大陣風(m/s)":data[17],"最大陣風風向(360degree)":data[18],"最大陣風風速時間(LST)":data[19],"降水量(mm)":data[20],"降水時數(hr)":data[21],"10分鐘最大降水量(mm)":data[22],"10分鐘最大降水起始時間(LST)":data[23]," 一小時最大降水量(mm)":data[24],"一小時最大降水量起始時間(LST)":data[25],"日照時數(hr)":data[26],"日照率(%)":data[27],"全天空日射量(MJ/㎡)":data[28],"能見度(km)":data[29],"A型蒸發量(mm)":data[30],"日最高紫外線指數":data[31],"日最高紫外線指數時間(LST)":data[32],"總雲量(0~10)":data[33],"year":data[34],"month":data[35],"day":data[36]})
+            day=day+1
+            data=[]
+        df=pd.concat([df,pd.DataFrame(fdata)], ignore_index=True,sort=True)
+    path=r"C:\Users\admin\Desktop\Project\data"+"\\"+place[a]+"\\"+"氣象資料"+"\\"+"氣象資料"+".csv"
+    df.to_csv(path, encoding='utf_8_sig')
 
 
 # In[ ]:
