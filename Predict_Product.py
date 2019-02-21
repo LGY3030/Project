@@ -1,19 +1,24 @@
 
 # coding: utf-8
 
-# In[12]:
+# In[2]:
 
 
 import pandas as pd
 import numpy as np
 import keras
 from keras.models import Sequential
-from keras.layers import Dense,LSTM,Dropout
+from keras.layers import Dense,LSTM,Dropout,Activation
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping
 from sklearn.utils import shuffle
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
+
+
+# In[3]:
+
+
 def buildTrain(train, pastDay=1, futureDay=1):
     X_train, Y_train ,Z_train= [], [],[]
     for i in range(train.shape[0]-futureDay-pastDay+1):
@@ -33,6 +38,11 @@ def splitData(X,Y,Z,rate):
     Y_val = Y[:int(Y.shape[0]*rate)]
     Z_val = Z[:int(Z.shape[0]*rate)]
     return X_train, Y_train, X_val, Y_val,Z_val
+
+
+# In[23]:
+
+
 train = pd.read_csv(r"C:\Users\admin\Desktop\Project\data\台北一\蔬果\奇異果-進口.csv")
 train=train.drop(["Unnamed: 0"], axis=1)
 train=train.drop(["crop_name"], axis=1)
@@ -45,20 +55,26 @@ train_x1,train_y1,train_z1=buildTrain(train)
 train_x2,train_y2,train_z2=buildTrain(temp)
 train_x,train_y,train_z=train_x1,train_y2,train_z2
 train_x,train_y,train_z= shuffle(train_x,train_y,train_z)
-train_x,train_y, val_x, val_y ,val_z= splitData(train_x,train_y,train_z, 0.1)
+train_x,train_y, val_x, val_y ,val_z= splitData(train_x,train_y,train_z, 0.05)
+
+
+# In[24]:
+
+
 model = Sequential()
-model.add(LSTM(30, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
-model.add(Dropout(0.2))
-model.add(LSTM(30))
-model.add(Dropout(0.2))
+model.add(LSTM(200, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+model.add(Dropout(0.6))
+model.add(LSTM(150))
+model.add(Dropout(0.6))
 model.add(Dense(1))
+model.add(Activation('linear'))
 model.compile(loss='mean_squared_error', optimizer='adam')
 model.summary()
 callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-model.fit(train_x,train_y, epochs=300, batch_size=16, validation_split=0.1, callbacks=[callback])
+model.fit(train_x,train_y, epochs=300, batch_size=32, validation_split=0.1, callbacks=[callback])
 
 
-# In[41]:
+# In[25]:
 
 
 a=range(0,val_y.shape[0])
@@ -84,8 +100,84 @@ print("accuracy:"+str(acc)+"%")
 plt.show()
 
 
-# In[35]:
+# In[ ]:
 
 
+model = Sequential()
+model.add(LSTM(64, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+model.add(Dropout(0.3))
+model.add(LSTM(32))
+model.add(Dropout(0.3))
+model.add(Dense(1))
+model.compile(loss='mean_squared_error', optimizer='adam')
+model.summary()
+callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
+model.fit(train_x,train_y, epochs=300, batch_size=8, validation_split=0.1, callbacks=[callback])
 
+
+# In[5]:
+
+
+a=range(0,val_y.shape[0])
+val_y=val_y.reshape(-1)
+val_z=val_z.reshape(-1)
+plt.plot(a,val_y)
+b=[]
+co=0
+for i in range(0,val_x.shape[0]):
+    temp=val_x[i]
+    temp=temp.reshape(1,1,9)
+    z=model.predict(temp, verbose=0)
+    if val_y[i]>=val_z[i] and z>=val_z[i]:
+        co=co+1
+    if val_y[i]<val_z[i] and z<val_z[i]:
+        co=co+1
+    b.append(z)
+b=np.array(b)
+b=b.reshape(-1)
+plt.plot(a,b)
+acc=100*(co/val_x.shape[0])
+print("accuracy:"+str(acc)+"%")
+plt.show()
+
+
+# In[ ]:
+
+
+model = Sequential()
+model.add(LSTM(200, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(200))
+model.add(Dropout(0.2))
+model.add(Dense(1))
+model.compile(loss='mean_squared_error', optimizer='adam')
+model.summary()
+callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
+model.fit(train_x,train_y, epochs=300, batch_size=16, validation_split=0.1, callbacks=[callback])
+
+
+# In[ ]:
+
+
+a=range(0,val_y.shape[0])
+val_y=val_y.reshape(-1)
+val_z=val_z.reshape(-1)
+plt.plot(a,val_y)
+b=[]
+co=0
+for i in range(0,val_x.shape[0]):
+    temp=val_x[i]
+    temp=temp.reshape(1,1,9)
+    z=model.predict(temp, verbose=0)
+    if val_y[i]>=val_z[i] and z>=val_z[i]:
+        co=co+1
+    if val_y[i]<val_z[i] and z<val_z[i]:
+        co=co+1
+    b.append(z)
+b=np.array(b)
+b=b.reshape(-1)
+plt.plot(a,b)
+acc=100*(co/val_x.shape[0])
+print("accuracy:"+str(acc)+"%")
+plt.show()
 
