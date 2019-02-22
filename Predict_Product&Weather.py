@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[17]:
+# In[1]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-# In[ ]:
+# In[5]:
 
 
 train=pd.read_csv(r"C:\Users\admin\Desktop\Project\data\台北一\蔬果\奇異果-進口.csv")
@@ -38,14 +38,27 @@ weather=weather.drop(["降水量(mm)"], axis=1)
 a=0
 b=0
 c=weather.shape[0]
+d=0
 for i in range(0,train.shape[0]):
-    for j in range(0,c):
+    for j in range(a,c-d):
         if all([train["year"][i]==weather["year"][j] , train["month"][i]==weather["month"][j] , train["day"][i]==weather["day"][j]]):
+            weather=weather.drop(weather.index[a:b+a])
+            weather.reset_index(inplace=True)
+            weather=weather.drop(["index"], axis=1)
             a=a+1
-            b=b+1
-            #weather=weather.drop(weather.index[:b])
+            b=0
             break
         else:
             b=b+1
-print(a)
+            d=d+1
+weather=weather.drop(weather.index[train.shape[0]:])
+weather.reset_index(inplace=True)
+weather=weather.drop(["index"], axis=1)
+result=pd.concat([train,weather],axis=1)
+
+
+# In[6]:
+
+
+print(result)
 
