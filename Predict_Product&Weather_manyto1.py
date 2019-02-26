@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[24]:
+# In[1]:
 
 
 import pandas as pd
@@ -16,7 +16,58 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-# In[25]:
+# In[2]:
+
+
+train=pd.read_csv(r"C:\Users\admin\Desktop\Project\data\台北一\蔬果\奇異果-進口.csv")
+weather=pd.read_csv(r"C:\Users\admin\Desktop\Project\data\台北一\氣象資料\氣象資料.csv")
+weather=weather.drop(["Unnamed: 0"], axis=1)
+weather=weather.drop(["一小時最大降水量(mm)"], axis=1)
+weather=weather.drop(["10分鐘最大降水起始時間(LST)"], axis=1)
+weather=weather.drop(["10分鐘最大降水量(mm)"], axis=1)
+weather=weather.drop([" 一小時最大降水量(mm)"], axis=1)
+weather=weather.drop(["一小時最大降水量起始時間(LST)"], axis=1)
+weather=weather.drop(["日最高紫外線指數時間(LST)"], axis=1)
+weather=weather.drop(["最低氣溫時間(LST)"], axis=1)
+weather=weather.drop(["最大陣風風速時間(LST)"], axis=1)
+weather=weather.drop(["最小相對溼度時間(LST)"], axis=1)
+weather=weather.drop(["最高氣溫時間(LST)"], axis=1)
+weather=weather.drop(["測站最低氣壓時間(LST)"], axis=1)
+weather=weather.drop(["測站最高氣壓時間(LST)"], axis=1)
+weather=weather.drop(["降水量(mm)"], axis=1)
+weather=weather.drop(["日最高紫外線指數"], axis=1)
+weather=weather.drop(["A型蒸發量(mm)"], axis=1)
+
+a=0
+b=0
+c=weather.shape[0]
+d=0
+for i in range(0,train.shape[0]):
+    for j in range(a,c-d):
+        if all([train["year"][i]==weather["year"][j] , train["month"][i]==weather["month"][j] , train["day"][i]==weather["day"][j]]):
+            weather=weather.drop(weather.index[a:b+a])
+            weather.reset_index(inplace=True)
+            weather=weather.drop(["index"], axis=1)
+            a=a+1
+            b=0
+            break
+        else:
+            b=b+1
+            d=d+1
+weather=weather.drop(weather.index[train.shape[0]:])
+weather.reset_index(inplace=True)
+weather=weather.drop(["index"], axis=1)
+train=pd.concat([train,weather],axis=1)
+
+
+# In[3]:
+
+
+print(train)
+train.to_csv("test1.csv", encoding='utf_8_sig')
+
+
+# In[4]:
 
 
 def buildTrain(train, pastDay=5, futureDay=1):
@@ -40,32 +91,52 @@ def splitData(X,Y,Z,rate):
     return X_train, Y_train, X_val, Y_val,Z_val
 
 
-# In[26]:
+# In[5]:
 
 
-train = pd.read_csv(r"C:\Users\admin\Desktop\Project\data\台北一\蔬果\奇異果-進口.csv")
 train=train.drop(["Unnamed: 0"], axis=1)
 train=train.drop(["crop_name"], axis=1)
 train=train.drop(["crop_num"], axis=1)
 train=train.drop(["market_name"], axis=1)
 train=train.drop(["market_num"], axis=1)
+train=train.convert_objects(convert_numeric=True)
 temp=train
+
+
+# In[6]:
+
+
+print(train)
+
+
+# In[7]:
+
+
 train= train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
 train_x1,train_y1,train_z1=buildTrain(train)
 train_x2,train_y2,train_z2=buildTrain(temp)
 train_x,train_y,train_z=train_x1,train_y2,train_z2
 train_x,train_y,train_z= shuffle(train_x,train_y,train_z)
 train_x,train_y, val_x, val_y ,val_z= splitData(train_x,train_y,train_z, 0.075)
+print(train_x.shape)
+print(train_y.shape)
+print(val_x.shape)
+print(val_y.shape)
+print(val_z.shape)
 
 
-# In[27]:
+# In[11]:
 
 
 model = Sequential()
-model.add(LSTM(150, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+model.add(LSTM(100, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+model.add(Dropout(0.35))
+model.add(LSTM(100,return_sequences=True))
+model.add(Dropout(0.35))
+model.add(LSTM(100,return_sequences=True))
 model.add(Dropout(0.35))
 model.add(LSTM(50))
-model.add(Dropout(0.35))
+model.add(Dropout(0.3))
 model.add(Dense(1))
 model.add(Activation('linear'))
 model.compile(loss='mean_squared_error', optimizer='adam')
@@ -74,7 +145,7 @@ callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
 model.fit(train_x,train_y, epochs=300, batch_size=16, validation_split=0.1, callbacks=[callback])
 
 
-# In[28]:
+# In[12]:
 
 
 a=range(0,val_y.shape[0])
@@ -86,7 +157,7 @@ co=0
 coo=0
 for i in range(0,val_x.shape[0]):
     temp=val_x[i]
-    temp=temp.reshape(1,5,9)
+    temp=temp.reshape(1,5,32)
     z=model.predict(temp, verbose=0)
     if val_y[i]>=val_z[i] and z>=val_z[i]:
         co=co+1
@@ -113,20 +184,4 @@ print("accuracy:"+str(acc)+"%")
 acc2=100*(coo/val_x.shape[0])
 print("accuracy(50%):"+str(acc2)+"%")
 plt.show()
-
-
-# In[17]:
-
-
-print(temp.shape)
-
-
-# In[21]:
-
-
-print(train_x.shape)
-print(train_y.shape)
-print(val_x.shape)
-print(val_y.shape)
-print(val_z.shape)
 
