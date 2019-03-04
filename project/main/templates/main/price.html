@@ -1,7 +1,13 @@
-{% extends "main/base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Price Page</title>
+</head>
+<body>
+    <img src="{{MEDIA_URL}}/static/images/waiting.gif" alt="loading "/>
     <h1>main price</h1>
     <p> 結果:{{result}} </p>
     <p> 差的平均:{{average}} </p>
     <p> 差的標準差:{{ss}} </p>
-{% endblock content %}
+</body>
+</html>
