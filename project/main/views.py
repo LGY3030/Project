@@ -39,11 +39,11 @@ def home(request):
 
 
 def price(request):
-    data = crawler()
+    data, test = crawler()
     train_x, train_y, val_x, val_y, val_z = manageData(data)
     model = buildModel(train_x, train_y)
     result, average, ss = getResult(model, val_x, val_y, val_z)
-    context = {'title': 'price', 'result': result, 'average': average, 'ss': ss}
+    context = {'title': 'price', 'result': result, 'average': average, 'ss': ss, 'test': test}
     return render(request, 'main/price.html', context)
 
 
@@ -82,7 +82,7 @@ def crawler():
     df["dayofweek"] = df["date"].dt.dayofweek
     df = df.drop(["date"], axis=1)
 
-    return df
+    return df, str(type(urlopen(url).read()))
 
 
 def buildTrain(train, pastDay=1, futureDay=1):
