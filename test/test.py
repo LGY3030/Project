@@ -270,7 +270,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y):
     co=0
     for i in range(0,val_x.shape[0]):
         temp=val_x[i]
-        temp=temp.reshape(1,1,9)
+        temp=temp.reshape(1,x,9)
         z=int(model.predict(temp, verbose=0))
         if val_y[i]>=val_z[i] and z>=val_z[i]:
             co=co+1
@@ -283,6 +283,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y):
     acc=100*(co/val_x.shape[0])
     print("accuracy:"+str(acc)+"%")
     plt.savefig('img/'+str(layer[0])+'+'+str(layer[1])+'+'+str(layer[2])+'+'+str(layer[3])+'+'+str(layer[4])+'+'+'ac,'+str(acc)+"%"+'+'+'lb,'+str(x)+'+'+'bs,'+str(y)+'.jpg')
+    plt.clf()
     return str(acc)
 
 
@@ -294,6 +295,7 @@ batch_size=[4,8,16,32,64,128,256]
 col_name=["1","2","3","4","5","acc","lookback","batch_size"]
 df=pd.DataFrame(columns=col_name)
 for i in lookback:
+    df=pd.DataFrame(columns=col_name)
     for j in batch_size:
         data=[]
         train=readData()
@@ -374,7 +376,7 @@ for i in lookback:
         layer=layer_17
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
         df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
-df.to_csv('data.csv', encoding='utf_8_sig')
+    df.to_csv('data'+'(lookback  '+str(lookback)+')'+'.csv', encoding='utf_8_sig')
 
 
 # In[15]:
