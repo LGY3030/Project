@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[16]:
+# In[9]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-# In[52]:
+# In[10]:
 
 
 def readData():
@@ -62,7 +62,7 @@ def buildModel_1(train_x,train_y,bs):
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x,train_y, epochs=10, batch_size=bs, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=1000, batch_size=bs, validation_split=0.1, callbacks=[callback])
     return model,[10,0,0,0,0]
 def buildModel_2(train_x,train_y,bs):
     model = Sequential()
@@ -72,7 +72,7 @@ def buildModel_2(train_x,train_y,bs):
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x,train_y, epochs=10, batch_size=bs, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=1000, batch_size=bs, validation_split=0.1, callbacks=[callback])
     return model,[10,10,0,0,0]
 def buildModel_3(train_x,train_y,bs):
     model = Sequential()
@@ -287,7 +287,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y):
     return str(acc)
 
 
-# In[53]:
+# In[11]:
 
 
 lookback=[1,3,5,7,14,21,30,60,90,120,150,180,210,240,270,300,330,360]
@@ -330,57 +330,51 @@ for i in lookback:
         pre=predict(model_2,layer_2,val_x,val_y,val_z,i,j)
         layer=layer_2
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_3,layer_3,val_x,val_y,val_z,i,j)
+        pre=predict(model_3,layer_3,val_x,val_y,val_z,i,j)
         layer=layer_3
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_4,layer_4,val_x,val_y,val_z,i,j)
+        pre=predict(model_4,layer_4,val_x,val_y,val_z,i,j)
         layer=layer_4
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_5,layer_5,val_x,val_y,val_z,i,j)
+        pre=predict(model_5,layer_5,val_x,val_y,val_z,i,j)
         layer=layer_5
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_6,layer_6,val_x,val_y,val_z,i,j)
+        pre=predict(model_6,layer_6,val_x,val_y,val_z,i,j)
         layer=layer_6
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_7,layer_7,val_x,val_y,val_z,i,j)
+        pre=predict(model_7,layer_7,val_x,val_y,val_z,i,j)
         layer=layer_7
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_8,layer_8,val_x,val_y,val_z,i,j)
+        pre=predict(model_8,layer_8,val_x,val_y,val_z,i,j)
         layer=layer_8
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_9,layer_9,val_x,val_y,val_z,i,j)
+        pre=predict(model_9,layer_9,val_x,val_y,val_z,i,j)
         layer=layer_9
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_10,layer_10,val_x,val_y,val_z,i,j)
+        pre=predict(model_10,layer_10,val_x,val_y,val_z,i,j)
         layer=layer_10
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_11,layer_11,val_x,val_y,val_z,i,j)
+        pre=predict(model_11,layer_11,val_x,val_y,val_z,i,j)
         layer=layer_11
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_12,layer_12,val_x,val_y,val_z,i,j)
+        pre=predict(model_12,layer_12,val_x,val_y,val_z,i,j)
         layer=layer_12
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_13,layer_13,val_x,val_y,val_z,i,j)
+        pre=predict(model_13,layer_13,val_x,val_y,val_z,i,j)
         layer=layer_13
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_14,layer_14,val_x,val_y,val_z,i,j)
+        pre=predict(model_14,layer_14,val_x,val_y,val_z,i,j)
         layer=layer_14
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_15,layer_15,val_x,val_y,val_z,i,j)
+        pre=predict(model_15,layer_15,val_x,val_y,val_z,i,j)
         layer=layer_15
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_16,layer_16,val_x,val_y,val_z,i,j)
+        pre=predict(model_16,layer_16,val_x,val_y,val_z,i,j)
         layer=layer_16
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
-        predict(model_17,layer_17,val_x,val_y,val_z,i,j)
+        pre=predict(model_17,layer_17,val_x,val_y,val_z,i,j)
         layer=layer_17
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
         df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
-    df.to_csv('data'+'(lookback  '+str(lookback)+')'+'.csv', encoding='utf_8_sig')
-
-
-# In[15]:
-
-
-predict(model_3,val_x,val_y,val_z)
+        df.to_csv('data'+'(lookback  '+str(i)+')'+'(bs  '+str(j)+')'+'.csv', encoding='utf_8_sig')
 
