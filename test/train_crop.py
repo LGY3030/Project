@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[9]:
@@ -377,4 +377,10 @@ for i in lookback:
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":i,"batch_size":j})
         df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
         df.to_csv('data'+'(lookback  '+str(i)+')'+'(bs  '+str(j)+')'+'.csv', encoding='utf_8_sig')
+
+
+# In[ ]:
+
+
+
 
