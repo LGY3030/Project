@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
-# In[108]:
+# In[1]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-# In[ ]:
+# In[2]:
 
 
 def readData(name):
@@ -27,24 +27,10 @@ def readData(name):
     train=train.drop(["market_name"], axis=1)
     train=train.drop(["market_num"], axis=1)
     
-    
+
     weather=pd.read_csv(name+".csv")
-    weather=weather.drop(["Unnamed: 0"], axis=1)
-    weather=weather.drop(["一小時最大降水量(mm)"], axis=1)
-    weather=weather.drop(["10分鐘最大降水起始時間(LST)"], axis=1)
-    weather=weather.drop(["10分鐘最大降水量(mm)"], axis=1)
-    weather=weather.drop([" 一小時最大降水量(mm)"], axis=1)
-    weather=weather.drop(["一小時最大降水量起始時間(LST)"], axis=1)
-    weather=weather.drop(["日最高紫外線指數時間(LST)"], axis=1)
-    weather=weather.drop(["最低氣溫時間(LST)"], axis=1)
-    weather=weather.drop(["最大陣風風速時間(LST)"], axis=1)
-    weather=weather.drop(["最小相對溼度時間(LST)"], axis=1)
-    weather=weather.drop(["最高氣溫時間(LST)"], axis=1)
-    weather=weather.drop(["測站最低氣壓時間(LST)"], axis=1)
-    weather=weather.drop(["測站最高氣壓時間(LST)"], axis=1)
-    weather=weather.drop(["降水量(mm)"], axis=1)
-    weather=weather.drop(["日最高紫外線指數"], axis=1)
-    weather=weather.drop(["A型蒸發量(mm)"], axis=1)
+    weather=weather[['測站氣壓(hPa)','降水量(mm)','風速(m/s)','year','month','day']]
+    
 
     return train,weather
 
@@ -72,10 +58,11 @@ def concatData(train,weather):
     return train
 
 def sta(train):
+    train=train.convert_objects(convert_numeric=True)
     train= train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
     return train
 
-def buildTrain(train, pastDay=1, futureDay=1):
+def buildTrain(train, pastDay, futureDay):
     X_train, Y_train ,Z_train= [], [],[]
     for i in range(train.shape[0]-futureDay-pastDay+1):
         X_train.append(np.array(train.iloc[i:i+pastDay]))
@@ -99,13 +86,16 @@ def splitData(X,Y,Z,rate):
 
 def buildModel(train_x,train_y,bs):
     model = Sequential()
-    model.add(LSTM(10, input_length=train_x.shape[1],input_dim= train_x.shape[2]))
+    model.add(LSTM(10, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+    model.add(LSTM(10,return_sequences=True))
+    model.add(LSTM(10,return_sequences=True))
+    model.add(LSTM(10))
     model.add(Dense(1))
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
     model.fit(train_x,train_y, epochs=1000, batch_size=bs, validation_split=0.1, callbacks=[callback])
-    return model,[10,0,0,0,0]
+    return model,[10,10,10,10,0]
 
 def predict(model,layer,val_x,val_y,val_z,x,y,name):
     a=range(0,val_y.shape[0])
@@ -116,7 +106,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name):
     co=0
     for i in range(0,val_x.shape[0]):
         temp=val_x[i]
-        temp=temp.reshape(1,x,9)
+        temp=temp.reshape(1,x,19)
         z=int(model.predict(temp, verbose=0))
         if val_y[i]>=val_z[i] and z>=val_z[i]:
             co=co+1
@@ -127,7 +117,6 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name):
     b=b.reshape(-1)
     plt.plot(a,b)
     acc=100*(co/val_x.shape[0])
-    print("accuracy:"+str(acc)+"%")
     plt.savefig(name+'img/'+str(layer[0])+'+'+str(layer[1])+'+'+str(layer[2])+'+'+str(layer[3])+'+'+str(layer[4])+'+'+'ac,'+str(acc)+"%"+'+'+'lb,'+str(x)+'+'+'bs,'+str(y)+'.jpg')
     plt.clf()
     return str(acc)
@@ -136,8 +125,8 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name):
 # In[ ]:
 
 
-lookback=1
-batch_size=128
+lookback=21
+batch_size=32
 col_name=["1","2","3","4","5","acc","lookback","batch_size"]
 place_name=["雲林","嘉義","彰化","台南","高雄","屏東","台中","苗栗","桃園","台北"]
 
