@@ -56,19 +56,18 @@ for a in place:
         time.sleep(3000.0/1000.0)
 
 
-# In[2]:
+# In[ ]:
 
 
-place=["台北一","台北二","板橋區","桃農","台中","豐原","嘉義","高雄","台東","宜蘭"]
-place_name=["臺北","臺北","板橋","蘆竹","臺中","豐原","嘉義","高雄","臺東","宜蘭"]
-place_num=["466920","466920","466880","C0C620","467490","C0F9M0","467480","467440","467660","467080"]
+place_name=["雲林","嘉義","彰化","台南","高雄","屏東","台中","苗栗","桃園","台北"]
+place_num=["C0K240","467480","C0G620","467410","467440","467590","467490","C0E420","C0C480","466920"]
 date=[]
 for year in ['2012','2013','2014','2015','2016','2017','2018']:
     for month in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']:
         date.append('-'.join([year,month]))
 date.append('2019-01')
 date.append('2019-02')
-for a in range(0,len(place)):
+for a in range(0,len(place_name)):
     flag=0
     name=urllib.parse.quote(urllib.parse.quote(place_name[a]))
     for dd in date:
@@ -103,7 +102,7 @@ for a in range(0,len(place)):
             day=day+1
             data=[]
         df=pd.concat([df,pd.DataFrame(fdata)], ignore_index=True,sort=True)
-    path=r"C:\Users\admin\Desktop\Project\data"+"\\"+place[a]+"\\"+"氣象資料"+"\\"+"氣象資料"+".csv"
+    path=r"C:\Users\admin\Desktop\Project\test"+"\\"+place_name[a]+".csv"
     df.to_csv(path, encoding='utf_8_sig')
 
 

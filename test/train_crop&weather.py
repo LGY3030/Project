@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 # In[ ]:
 
 
-def readData():
+def readData(name):
     train = pd.read_csv("甘藍-初秋.csv")
     train=train.drop(["Unnamed: 0"], axis=1)
     train=train.drop(["crop_name"], axis=1)
@@ -28,7 +28,7 @@ def readData():
     train=train.drop(["market_num"], axis=1)
     
     
-    weather=pd.read_csv("氣象資料.csv")
+    weather=pd.read_csv(name+".csv")
     weather=weather.drop(["Unnamed: 0"], axis=1)
     weather=weather.drop(["一小時最大降水量(mm)"], axis=1)
     weather=weather.drop(["10分鐘最大降水起始時間(LST)"], axis=1)
@@ -139,20 +139,24 @@ def predict(model,layer,val_x,val_y,val_z,x,y):
 lookback=1
 batch_size=128
 col_name=["1","2","3","4","5","acc","lookback","batch_size"]
-df=pd.DataFrame(columns=col_name)
-data=[]
-train,weather=readData()
-train=concatData(train,weather)
-temp=train
-train=sta(train)
-train_x1,train_y1,train_z1=buildTrain(train,lookback,1)
-train_x2,train_y2,train_z2=buildTrain(temp,lookback,1)
-train_x,train_y,train_z=train_x1,train_y2,train_z2
-train_x,train_y,train_z= shuffle(train_x,train_y,train_z)
-train_x,train_y, val_x, val_y ,val_z= splitData(train_x,train_y,train_z, 0.05)
-model,layer=buildModel(train_x,train_y,batch_size)
-pre=predict(model,layer,val_x,val_y,val_z,lookback,batch_size)
-data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":lookback,"batch_size":batch_size})
-df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
-df.to_csv('data'+'(lookback  '+str(i)+')'+'(bs  '+str(j)+')'+'.csv', encoding='utf_8_sig')
+place_name=["雲林","嘉義","彰化","台南","高雄","屏東","台中","苗栗","桃園","台北"]
+
+for i in place_name:
+    
+    df=pd.DataFrame(columns=col_name)
+    data=[]
+    train,weather=readData(i)
+    train=concatData(train,weather)
+    temp=train
+    train=sta(train)
+    train_x1,train_y1,train_z1=buildTrain(train,lookback,1)
+    train_x2,train_y2,train_z2=buildTrain(temp,lookback,1)
+    train_x,train_y,train_z=train_x1,train_y2,train_z2
+    train_x,train_y,train_z= shuffle(train_x,train_y,train_z)
+    train_x,train_y, val_x, val_y ,val_z= splitData(train_x,train_y,train_z, 0.05)
+    model,layer=buildModel(train_x,train_y,batch_size)
+    pre=predict(model,layer,val_x,val_y,val_z,lookback,batch_size)
+    data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":lookback,"batch_size":batch_size})
+    df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
+    df.to_csv('data'+'(lookback  '+str(i)+')'+'(bs  '+str(j)+')'+'.csv', encoding='utf_8_sig')
 
