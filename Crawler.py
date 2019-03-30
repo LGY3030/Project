@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 from urllib.request import urlopen
@@ -56,7 +56,7 @@ for a in place:
         time.sleep(3000.0/1000.0)
 
 
-# In[ ]:
+# In[3]:
 
 
 place_name=["雲林","嘉義","彰化","台南","高雄","屏東","台中","苗栗","桃園","台北"]
@@ -104,10 +104,4 @@ for a in range(0,len(place_name)):
         df=pd.concat([df,pd.DataFrame(fdata)], ignore_index=True,sort=True)
     path=r"C:\Users\admin\Desktop\Project\test"+"\\"+place_name[a]+".csv"
     df.to_csv(path, encoding='utf_8_sig')
-
-
-# In[ ]:
-
-
-
 
