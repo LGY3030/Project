@@ -39,22 +39,29 @@ def home(request):
 
 
 def price(request):
-    data, test = crawler()
-    train_x, train_y, val_x, val_y, val_z = manageData(data)
-    model = buildModel(train_x, train_y)
-    result, average, ss = getResult(model, val_x, val_y, val_z)
-    context = {'title': 'price', 'result': result, 'average': average, 'ss': ss, 'test': test}
-    return render(request, 'main/price.html', context)
+    if request.method == "POST":        #如果是以POST的方式才處理
+        mess = request.POST['username'] #取得表單輸入資料
+    else:
+        mess = "表單資料尚未送出!"
+    return render(request,"main/price.html",locals())
 
 
 def volume(request):
-    return render(request, 'main/volume.html', {'title': 'volume'})
+    return render(request, 'main/result.html')
 
 
-def crawler():
-    place = "台北一"
-    crop_num = "G49"
-    crop_name = "奇異果-進口"
+def wrong(request):
+    return render(request, 'main/wrong.html')
+
+
+def result(request):
+    return render(request, 'main/result.html')
+
+
+def crawler(Crop_market, Crop_name, Crop_num):
+    place = Crop_market
+    crop_num = Crop_num
+    crop_name = Crop_name
     col_name = ["date", "crop_num", "crop_name", "market_num", "market_name", "high", "medium", "low", "mean", "volume"]
     df = pd.DataFrame(columns=col_name)
     skip_num = 0

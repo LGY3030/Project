@@ -1,25 +1,16 @@
-{% extends "main/base.html" %}
-{% block title %}Home Page{% endblock %}
-{% block content %}
-    <h1>main price</h1>
-    <p> 結果:{{result}} </p>
-    <p> 差的平均:{{average}} </p>
-    <p> 差的標準差:{{ss}} </p>
-    <p>{{test}}</p>
-{% endblock content %}
-
-<!--
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Price Page</title>
+    <meta charset="utf-8">
+    <title>表單傳送範例</title>
 </head>
 <body>
-    <img src="{{MEDIA_URL}}/static/images/waiting.gif" alt="loading "/>
-    <h1>main price</h1>
-    <p> 結果:{{result}} </p>
-    <p> 差的平均:{{average}} </p>
-    <p> 差的標準差:{{ss}} </p>
+    <form action="/main/price/" method="POST" name="form1">
+        {% csrf_token %}  <!-- 啟動CSRF防護，保護伺服器避免被攻擊 -->
+        <div>請輸入姓名：<input type="text" name="username">
+            <input type="submit" value="送出資料">
+        </div>
+        <div>接收到的資料：{{mess}}</div>
+    </form>
 </body>
 </html>
--->

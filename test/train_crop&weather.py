@@ -71,7 +71,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name):
     co=0
     for i in range(0,val_x.shape[0]):
         temp=val_x[i]
-        temp=temp.reshape(1,x,15)
+        temp=temp.reshape(1,x,22)
         z=int(model.predict(temp, verbose=0))
         if val_y[i]>=val_z[i] and z>=val_z[i]:
             co=co+1
