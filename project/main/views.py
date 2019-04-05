@@ -17,6 +17,7 @@ import urllib
 import time
 import os
 
+
 posts = [
     {
         'author': 'Jimmy',
@@ -39,15 +40,23 @@ def home(request):
 
 
 def price(request):
-    if request.method == "POST":        #如果是以POST的方式才處理
-        mess = request.POST['username'] #取得表單輸入資料
-    else:
-        mess = "表單資料尚未送出!"
-    return render(request,"main/price.html",locals())
+    if request.method == "POST":  # 如果是以POST的方式才處理
+        try:
+            Crop_market = request.POST['Crop market']  # 取得表單輸入資料
+            Crop_name = request.POST['Crop name']
+            Crop_num = request.POST['Crop num']
+            data, test = crawler(Crop_market, Crop_name, Crop_num)
+            train_x, train_y, val_x, val_y, val_z = manageData(data)
+            model = buildModel(train_x, train_y)
+            result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z)
+            context = {'title': 'price', 'result': result, 'average': average, 'ss': ss, 'test': [1, 2, 3, 4, 5], 'a': a, 'b': b, 'c': c}
+        except:
+            context = {}
+    return render(request, "main/price.html", locals())
 
 
 def volume(request):
-    return render(request, 'main/result.html')
+    return render(request, 'main/volume.html')
 
 
 def wrong(request):
@@ -152,7 +161,7 @@ def getResult(model, val_x, val_y, val_z):
     a = range(0, val_y.shape[0])
     val_y = val_y.reshape(-1)
     val_z = val_z.reshape(-1)
-    # plt.plot(a,val_y)
+    #plt.plot(a, val_y)
     b = []
     c = []
     co = 0
@@ -169,30 +178,12 @@ def getResult(model, val_x, val_y, val_z):
             sub = val_y[i] - z
         if val_y[i] < z:
             sub = z - val_y[i]
-        '''
-        sub = val_y[i] - val_z[i]
-        sub_a = 0.5 * sub + val_z[i]
-        sub_b = 1.5 * sub + val_z[i]
-        sub2 = val_z[i] - val_y[i]
-        sub2_a = val_z[i] - 0.5 * sub2
-        sub2_b = val_z[i] - 1.5 * sub2
-        if val_y[i] >= val_z[i] and z >= val_z[i]:
-            if z >= sub_a and z <= sub_b:
-                coo = coo + 1
-        if val_y[i] < val_z[i] and z < val_z[i]:
-            if z <= sub2_a and z >= sub2_b:
-                coo = coo + 1
-        '''
         b.append(z)
         c.append(sub)
     b = np.array(b)
     b = b.reshape(-1)
-    # plt.plot(a,b)
+    #plt.plot(a, b)
     acc = 100 * (co / val_x.shape[0])
-    # print("accuracy:"+str(acc)+"%")
-    #acc2 = 100 * (coo / val_x.shape[0])
-    # print("accuracy(50%):"+str(acc2)+"%")
-    # plt.show()
     total = 0
     totalss = 0
     for i in c:
@@ -200,4 +191,4 @@ def getResult(model, val_x, val_y, val_z):
         totalss = totalss + i * i
     average = float(total / len(c))
     ss = float((totalss / len(c))**0.5)
-    return acc, average, ss
+    return acc, average, ss, list(a), list(b), list(val_z)
