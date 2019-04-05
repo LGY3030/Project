@@ -45,7 +45,8 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-          {% block content %}{% endblock %}
+            <div>接收到的資料：{{context.test}}</div>
+            <div id="tester"></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
@@ -70,22 +71,36 @@
         </div>
       </div>
     </main>
-    <div>接收到的資料：{{context.test}}</div>
-    <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
-    <div id="tester" style="width:600px;height:250px;"></div>
-    <script>
-    TESTER = document.getElementById('tester');
-    Plotly.plot( TESTER, [{x: {{context.a}}, y: {{context.b}} }], {margin: { t: 0 } } );
-    Plotly.plot( TESTER, [{x: {{context.a}}, y: {{context.c}} }], {margin: { t: 0 } } );
-</script>
-
-
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+
+    <script>
+        TESTER = document.getElementById('tester');
+        var data =[
+            {
+                x: {{context.a}},
+                y: {{context.b}},
+                type: 'lines',
+                name:'price_predict'
+            },
+            {
+                x: {{context.a}},
+                y: {{context.c}},
+                type: 'lines',
+                name:'price_origin'
+            }
+        ];
+        var layout = {
+            width:750,
+            height:500,
+        };
+        Plotly.newPlot(TESTER, data, layout);
+    </script>
 
 </body>
 </html>

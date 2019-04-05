@@ -51,7 +51,7 @@ def price(request):
             result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z)
             context = {'title': 'price', 'result': result, 'average': average, 'ss': ss, 'test': [1, 2, 3, 4, 5], 'a': a, 'b': b, 'c': c}
         except:
-            context = {}
+            context = {"wrong": wrong}
     return render(request, "main/price.html", locals())
 
 
