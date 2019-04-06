@@ -10,7 +10,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Home page</title>
+    <title>Price page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -23,7 +23,7 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/">Django Web</a>
+          <a class="navbar-brand mr-4" href="/">Prediction Web</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
           </button>
@@ -45,8 +45,12 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div>接收到的資料：{{context.test}}</div>
+            <div><h5>{{context.title}}</h5></div>
             <div id="tester"></div>
+            <div></div>
+            <div><h4>{{context.accuracy}}</h4></div>
+            <div><h4>{{context.average}}</h4></div>
+            <div><h4>{{context.sd}}</h4></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
@@ -62,8 +66,23 @@
                   <input type="text" name="Crop name">
                   <p class='text-muted'>Crop num:
                   <input type="text" name="Crop num">
+                  <p class='text-muted'>W-station name:
+                  <input type="text" name="W-station name">
+                  <p class='text-muted'>W-station num:
+                  <input type="text" name="W-station num">
+                  <p class='text-muted'>Today date:
+                  <input type="text" name="Today date"><br />
                   <p class='text-muted'>
                   <input type="submit" value="Predict">
+                  <p class='text-muted'><br />
+                  <p class='text-muted'><h5>Sample input</h5>
+                  <p class='text-muted'>Crop market: 台北一
+                  <p class='text-muted'>Crop name: 甘藍-初秋
+                  <p class='text-muted'>Crop num: LA1
+                  <p class='text-muted'>W-station name: 鞍部
+                  <p class='text-muted'>W-station num: 466910
+                  <p class='text-muted'>Today date: 2019-04-06
+
                 </form>
               </ul>
             </p>
