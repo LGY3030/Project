@@ -48,12 +48,10 @@ def price(request):
             W_station_name = request.POST['W-station name']
             W_station_num = request.POST['W-station num']
             Today_date = request.POST['Today date']
-            print(1)
             data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
-            print(2)
-            train_x, train_y, val_x, val_y, val_z = manageData(data)
+            train_x, train_y, val_x, val_y, val_z ,a,b= manageData(data,'high')
             model = buildModel(train_x, train_y)
-            result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z)
+            result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z,a,b)
             title = 'Original price & Price predicted by model'
             accuracy = 'Accuracy of prediction: ' + str(result) + ' %'
             average = 'Average deviation of prediction: ' + str(average) + ' TWD'
@@ -65,7 +63,26 @@ def price(request):
 
 
 def volume(request):
-    return render(request, 'main/volume.html')
+    if request.method == "POST":
+        try:
+            Crop_market = request.POST['Crop market']
+            Crop_name = request.POST['Crop name']
+            Crop_num = request.POST['Crop num']
+            W_station_name = request.POST['W-station name']
+            W_station_num = request.POST['W-station num']
+            Today_date = request.POST['Today date']
+            data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
+            train_x, train_y, val_x, val_y, val_z ,mul_a,mul_b= manageData(data,'volume')
+            model = buildModel(train_x, train_y)
+            result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z,mul_a,mul_b)
+            title = 'Original volume & Volume predicted by model'
+            accuracy = 'Accuracy of prediction: ' + str(result) + ' %'
+            average = 'Average deviation of prediction: ' + str(average) + ' volume'
+            sd = 'Standard deviation of prediction: ' + str(ss)
+            context = {'title': title, 'accuracy': accuracy, 'average': average, 'sd': sd, 'a': a, 'b': b, 'c': c}
+        except:
+            context = {"wrong": wrong}
+    return render(request, "main/volume.html", locals())
 
 
 def crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date):
@@ -172,13 +189,20 @@ def crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_
     return train
 
 
-def buildTrain(train, pastDay=1, futureDay=1):
+def buildTrain(train, pastDay, futureDay,type):
     X_train, Y_train, Z_train = [], [], []
     for i in range(train.shape[0] - futureDay - pastDay + 1):
         X_train.append(np.array(train.iloc[i:i + pastDay]))
-        Y_train.append(np.array(train.iloc[i + pastDay:i + pastDay + futureDay]["high"]))
-        Z_train.append(np.array(train.iloc[i + pastDay - 1:i + pastDay + futureDay - 1]["high"]))
-    return np.array(X_train), np.array(Y_train), np.array(Z_train)
+        Y_train.append(np.array(train.iloc[i + pastDay:i + pastDay + futureDay][type]))
+        Z_train.append(np.array(train.iloc[i + pastDay - 1:i + pastDay + futureDay - 1][type]))
+    X_train=np.array(X_train)
+    Y_train=np.array(Y_train)
+    Z_train=np.array(Z_train)
+    a=np.mean(Y_train)
+    b=np.mean(Z_train)
+    Y_train=Y_train/a
+    Z_train=Z_train/b
+    return X_train, Y_train, Z_train,a,b
 
 
 def shuffle(X, Y, Z):
@@ -197,34 +221,31 @@ def splitData(X, Y, Z, rate):
     return X_train, Y_train, X_val, Y_val, Z_val
 
 
-def manageData(train):
+def manageData(train,type):
     train=train.convert_objects(convert_numeric=True)
     temp = train
     train = train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
-    train_x1, train_y1, train_z1 = buildTrain(train)
-    train_x2, train_y2, train_z2 = buildTrain(temp)
+    train_x1, train_y1, train_z1,a1,b1 = buildTrain(train, 7, 1,type)
+    train_x2, train_y2, train_z2,a2,b2 = buildTrain(temp, 7, 1,type)
     train_x, train_y, train_z = train_x1, train_y2, train_z2
     train_x, train_y, train_z = shuffle(train_x, train_y, train_z)
     train_x, train_y, val_x, val_y, val_z = splitData(train_x, train_y, train_z, 0.05)
-    return train_x, train_y, val_x, val_y, val_z
+    return train_x, train_y, val_x, val_y, val_z,a2,b2
 
 
 def buildModel(train_x, train_y):
     model = Sequential()
-    #model.add(LSTM(200, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
-    # model.add(Dropout(0.6))
-    model.add(LSTM(10, input_length=train_x.shape[1], input_dim=train_x.shape[2]))
-    # model.add(Dropout(0.6))
+    model.add(LSTM(32, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
+    model.add(LSTM(32))
     model.add(Dense(1))
-    model.add(Activation('linear'))
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x, train_y, epochs=300, batch_size=32, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=300, batch_size=32, validation_split=0.1, callbacks=[callback])
     return model
 
 
-def getResult(model, val_x, val_y, val_z):
+def getResult(model, val_x, val_y, val_z,mul_a,mul_b):
     a = range(0, val_y.shape[0])
     val_y = val_y.reshape(-1)
     val_z = val_z.reshape(-1)
@@ -235,16 +256,16 @@ def getResult(model, val_x, val_y, val_z):
     coo = 0
     for i in range(0, val_x.shape[0]):
         temp = val_x[i]
-        temp = temp.reshape(1, 1, 21)
+        temp = temp.reshape(1, 7, 21)
         z = model.predict(temp, verbose=0)
-        if val_y[i] >= val_z[i] and z >= val_z[i]:
+        if val_y[i]*mul_a >= val_z[i]*mul_b and z*mul_a >= val_z[i]*mul_b:
             co = co + 1
-        if val_y[i] < val_z[i] and z < val_z[i]:
+        if val_y[i]*mul_a < val_z[i]*mul_b and z*mul_a < val_z[i]*mul_b:
             co = co + 1
         if val_y[i] >= z:
-            sub = val_y[i] - z
+            sub = val_y[i]*mul_a - z*mul_a
         if val_y[i] < z:
-            sub = z - val_y[i]
+            sub = z*mul_a - val_y[i]*mul_a
         b.append(z)
         c.append(sub)
     b = np.array(b)
@@ -258,4 +279,4 @@ def getResult(model, val_x, val_y, val_z):
         totalss = totalss + i * i
     average = float(total / len(c))
     ss = float((totalss / len(c))**0.5)
-    return acc, average, ss, list(a), list(b), list(val_z)
+    return acc, average, ss, list(a), list(b*mul_a), list(val_y*mul_a)
