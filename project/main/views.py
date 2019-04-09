@@ -49,9 +49,9 @@ def price(request):
             W_station_num = request.POST['W-station num']
             Today_date = request.POST['Today date']
             data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
-            train_x, train_y, val_x, val_y, val_z ,a,b= manageData(data,'high')
-            model = buildModel(train_x, train_y)
-            result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z,a,b)
+            train_x, train_y,train_w, val_x, val_y, val_z ,a,b= manageData(data,'high',7,1)
+            model = buildModel(train_x, train_y,1)
+            result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,a,b,7,0)
             title = 'Original price & Price predicted by model'
             accuracy = 'Accuracy of prediction: ' + str(result) + ' %'
             average = 'Average deviation of prediction: ' + str(average) + ' TWD'
@@ -72,9 +72,9 @@ def volume(request):
             W_station_num = request.POST['W-station num']
             Today_date = request.POST['Today date']
             data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
-            train_x, train_y, val_x, val_y, val_z ,mul_a,mul_b= manageData(data,'volume')
-            model = buildModel(train_x, train_y)
-            result, average, ss, a, b, c = getResult(model, val_x, val_y, val_z,mul_a,mul_b)
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul_a,mul_b= manageData(data,'volume',7,1)
+            model = buildModel(train_x, train_y,1)
+            result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,mul_a,mul_b,7,0)
             title = 'Original volume & Volume predicted by model'
             accuracy = 'Accuracy of prediction: ' + str(result) + ' %'
             average = 'Average deviation of prediction: ' + str(average) + ' volume'
@@ -83,7 +83,27 @@ def volume(request):
         except:
             context = {"wrong": wrong}
     return render(request, "main/volume.html", locals())
+def price_trend(request):
+    if request.method == "POST":
+        try:
+            Crop_market = request.POST['Crop market']
+            Crop_name = request.POST['Crop name']
+            Crop_num = request.POST['Crop num']
+            W_station_name = request.POST['W-station name']
+            W_station_num = request.POST['W-station num']
+            Today_date = request.POST['Today date']
+            data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul_a,mul_b= manageData(data,'high',30,30)
+            model = buildModel(train_x, train_y,30)
+            a, b= getResult(model,train_w, val_x, val_y, val_z,mul_a,mul_b,30,1)
+            title = 'Price trend (in 30 days)'
+            context = {'title': title, 'a': a, 'b': b}
+        except:
+            context = {"wrong": wrong}
+    return render(request, "main/price_trend.html", locals())
 
+def volume_trend(request):
+    return render(request, 'main/volume_trend.html')
 
 def crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date):
     place=Crop_market
@@ -195,14 +215,16 @@ def buildTrain(train, pastDay, futureDay,type):
         X_train.append(np.array(train.iloc[i:i + pastDay]))
         Y_train.append(np.array(train.iloc[i + pastDay:i + pastDay + futureDay][type]))
         Z_train.append(np.array(train.iloc[i + pastDay - 1:i + pastDay + futureDay - 1][type]))
+    W_train=train.iloc[train.shape[0] -pastDay - 1:train.shape[0]-1]
     X_train=np.array(X_train)
     Y_train=np.array(Y_train)
     Z_train=np.array(Z_train)
+    W_train=np.array(W_train)
     a=np.mean(Y_train)
     b=np.mean(Z_train)
     Y_train=Y_train/a
     Z_train=Z_train/b
-    return X_train, Y_train, Z_train,a,b
+    return X_train, Y_train, Z_train,W_train,a,b
 
 
 def shuffle(X, Y, Z):
@@ -221,62 +243,70 @@ def splitData(X, Y, Z, rate):
     return X_train, Y_train, X_val, Y_val, Z_val
 
 
-def manageData(train,type):
+def manageData(train,type,past,future):
     train=train.convert_objects(convert_numeric=True)
     temp = train
     train = train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
-    train_x1, train_y1, train_z1,a1,b1 = buildTrain(train, 7, 1,type)
-    train_x2, train_y2, train_z2,a2,b2 = buildTrain(temp, 7, 1,type)
-    train_x, train_y, train_z = train_x1, train_y2, train_z2
+    train_x1, train_y1, train_z1,train_w1,a1,b1 = buildTrain(train, past, future,type)
+    train_x2, train_y2, train_z2,train_w2,a2,b2 = buildTrain(temp, past, future,type)
+    train_x, train_y, train_z ,train_w= train_x1, train_y2, train_z2,train_w1
     train_x, train_y, train_z = shuffle(train_x, train_y, train_z)
     train_x, train_y, val_x, val_y, val_z = splitData(train_x, train_y, train_z, 0.05)
-    return train_x, train_y, val_x, val_y, val_z,a2,b2
+    return train_x, train_y,train_w, val_x, val_y, val_z,a2,b2
 
 
-def buildModel(train_x, train_y):
+def buildModel(train_x, train_y,future):
     model = Sequential()
     model.add(LSTM(32, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
     model.add(LSTM(32))
-    model.add(Dense(1))
+    model.add(Dense(future))
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x,train_y, epochs=300, batch_size=32, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=1, batch_size=32, validation_split=0.1, callbacks=[callback])
     return model
 
 
-def getResult(model, val_x, val_y, val_z,mul_a,mul_b):
-    a = range(0, val_y.shape[0])
-    val_y = val_y.reshape(-1)
-    val_z = val_z.reshape(-1)
-    #plt.plot(a, val_y)
-    b = []
-    c = []
-    co = 0
-    coo = 0
-    for i in range(0, val_x.shape[0]):
-        temp = val_x[i]
-        temp = temp.reshape(1, 7, 21)
+def getResult(model,train_w, val_x, val_y, val_z,mul_a,mul_b,past,flag):
+    if flag==0:
+        a = range(0, val_y.shape[0])
+        val_y = val_y.reshape(-1)
+        val_z = val_z.reshape(-1)
+        #plt.plot(a, val_y)
+        b = []
+        c = []
+        co = 0
+        coo = 0
+        for i in range(0, val_x.shape[0]):
+            temp = val_x[i]
+            temp = temp.reshape(1, past, 21)
+            z = model.predict(temp, verbose=0)
+            if val_y[i]*mul_a >= val_z[i]*mul_b and z*mul_a >= val_z[i]*mul_b:
+                co = co + 1
+            if val_y[i]*mul_a < val_z[i]*mul_b and z*mul_a < val_z[i]*mul_b:
+                co = co + 1
+            if val_y[i] >= z:
+                sub = val_y[i]*mul_a - z*mul_a
+            if val_y[i] < z:
+                sub = z*mul_a - val_y[i]*mul_a
+            b.append(z)
+            c.append(sub)
+        b = np.array(b)
+        b = b.reshape(-1)
+        #plt.plot(a, b)
+        acc = 100 * (co / val_x.shape[0])
+        total = 0
+        totalss = 0
+        for i in c:
+            total = total + i
+            totalss = totalss + i * i
+        average = float(total / len(c))
+        ss = float((totalss / len(c))**0.5)
+        return acc, average, ss, list(a), list(b*mul_a), list(val_y*mul_a)
+    else:
+        a = range(30)
+        temp=train_w
+        temp = temp.reshape(1, past, 21)
         z = model.predict(temp, verbose=0)
-        if val_y[i]*mul_a >= val_z[i]*mul_b and z*mul_a >= val_z[i]*mul_b:
-            co = co + 1
-        if val_y[i]*mul_a < val_z[i]*mul_b and z*mul_a < val_z[i]*mul_b:
-            co = co + 1
-        if val_y[i] >= z:
-            sub = val_y[i]*mul_a - z*mul_a
-        if val_y[i] < z:
-            sub = z*mul_a - val_y[i]*mul_a
-        b.append(z)
-        c.append(sub)
-    b = np.array(b)
-    b = b.reshape(-1)
-    #plt.plot(a, b)
-    acc = 100 * (co / val_x.shape[0])
-    total = 0
-    totalss = 0
-    for i in c:
-        total = total + i
-        totalss = totalss + i * i
-    average = float(total / len(c))
-    ss = float((totalss / len(c))**0.5)
-    return acc, average, ss, list(a), list(b*mul_a), list(val_y*mul_a)
+        z = z.reshape(-1)
+        return list(a), list(z*mul_b)

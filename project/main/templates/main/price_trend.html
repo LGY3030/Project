@@ -10,7 +10,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Price page</title>
+    <title>Price trend page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -49,17 +49,13 @@
         <div class="col-md-8">
             <div><h5>{{context.title}}</h5></div>
             <div id="tester"></div>
-            <div></div>
-            <div><h4>{{context.accuracy}}</h4></div>
-            <div><h4>{{context.average}}</h4></div>
-            <div><h4>{{context.sd}}</h4></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
             <h3>Information Block</h3>
             <p class='text-muted'>You should put information here.
               <ul class="list-group">
-                <form action="/main/price/" method="POST" name="form1">
+                <form action="/main/price_trend/" method="POST" name="form1">
                 {% csrf_token %}
                   <p class='text-muted'>
                   <p class='text-muted'>Crop market:
@@ -109,12 +105,6 @@
                 type: 'lines',
                 name:'price_predict'
             },
-            {
-                x: {{context.a}},
-                y: {{context.c}},
-                type: 'lines',
-                name:'price_origin'
-            }
         ];
         var layout = {
             width:750,
@@ -127,7 +117,3 @@
 
 </body>
 </html>
-
-
-
-
