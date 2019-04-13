@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[2]:
@@ -72,7 +72,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name,num):
     co=0
     for i in range(0,val_x.shape[0]):
         temp=val_x[i]
-        temp=temp.reshape(1,x,25)
+        temp=temp.reshape(1,x,27)
         z=int(model.predict(temp, verbose=0))
         if val_y[i]>=val_z[i] and z>=val_z[i]:
             co=co+1
@@ -94,7 +94,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name,num):
 lookback=7
 batch_size=32
 col_name=["1","2","3","4","5","acc","lookback","batch_size","name","num"]
-place_name=["train+oil雲林","train+oil嘉義","train+oil彰化","train+oil台南","train+oil高雄","train+oil屏東","train+oil台中","train+oil苗栗","train+oil桃園","train+oil台北"]
+place_name=["train+oil+weather+國定假日+拜拜日 雲林","train+oil+weather+國定假日+拜拜日 嘉義","train+oil+weather+國定假日+拜拜日 彰化","train+oil+weather+國定假日+拜拜日 台南","train+oil+weather+國定假日+拜拜日 高雄","train+oil+weather+國定假日+拜拜日 屏東","train+oil+weather+國定假日+拜拜日 台中","train+oil+weather+國定假日+拜拜日 苗栗","train+oil+weather+國定假日+拜拜日 桃園","train+oil+weather+國定假日+拜拜日 台北"]
 
 for i in place_name:
     df=pd.DataFrame(columns=col_name)
@@ -113,10 +113,4 @@ for i in place_name:
         data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":lookback,"batch_size":batch_size,"name":i,"num":j})
     df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
     df.to_csv(i+'_data'+'(lookback  '+str(lookback)+')'+'(bs  '+str(batch_size)+')'+'.csv', encoding='utf_8_sig')
-
-
-# In[ ]:
-
-
-
 
