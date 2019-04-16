@@ -48,10 +48,10 @@ def price(request):
             W_station_name = request.POST['Wstation name']
             W_station_num = request.POST['Wstation num']
             Today_date = request.POST['Today date']
-            data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
-            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',7,1)
+            data ,valid= crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date,"2012-01-01")
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',7,"2012-01-01",valid,0)
             model = buildModel(train_x, train_y,1)
-            result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,mul,7,0)
+            result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,mul,7,0,0,0)
             title = 'Original price & Price predicted by model'
             accuracy = 'Accuracy of prediction: ' + str(result) + ' %'
             average = 'Average deviation of prediction: ' + str(average) + ' TWD'
@@ -71,10 +71,10 @@ def volume(request):
             W_station_name = request.POST['Wstation name']
             W_station_num = request.POST['Wstation num']
             Today_date = request.POST['Today date']
-            data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
-            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'volume',7,1)
+            data ,valid= crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date,"2012-01-01")
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'volume',7,"2012-01-01",valid,0)
             model = buildModel(train_x, train_y,1)
-            result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,mul,7,0)
+            result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,mul,7,0,0,0)
             title = 'Original volume & Volume predicted by model'
             accuracy = 'Accuracy of prediction: ' + str(result) + ' %'
             average = 'Average deviation of prediction: ' + str(average) + ' volume'
@@ -92,12 +92,14 @@ def price_trend(request):
             W_station_name = request.POST['Wstation name']
             W_station_num = request.POST['Wstation num']
             Today_date = request.POST['Today date']
-            data = crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date)
-            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',30,30)
-            model = buildModel(train_x, train_y,30)
-            a, b= getResult(model,train_w, val_x, val_y, val_z,mul,30,1)
+            Validation_date = request.POST['Validation date']
+            Predict_days = int(request.POST['Predict days'])
+            data,valid= crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date,Validation_date)
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul,valid_x,valid_y= manageData(data,'high',Predict_days,Predict_days,Validation_date,valid,1)
+            model = buildModel(train_x, train_y,Predict_days)
+            a, b,c= getResult(model,train_w, val_x, val_y, val_z,mul,Predict_days,valid_x,valid_y,1)
             title = 'Price trend (in 30 days)'
-            context = {'title': title, 'a': a, 'b': b}
+            context = {'title': title, 'a': a, 'b': b,'c':c,'d':list(valid_y)}
         except:
             context = {"wrong": wrong}
     return render(request, "main/price_trend.html", locals())
@@ -128,7 +130,7 @@ def price_trend_compare(request):
             context = {"wrong": wrong}
     return render(request, "main/price_trend_compare.html", locals())
 
-def crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date):
+def crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date,Validation_date):
     place=Crop_market
     crop_num=Crop_num
     crop_name=Crop_name
@@ -228,8 +230,9 @@ def crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_
     train=train.drop(["crop_num"], axis=1)
     train=train.drop(["market_name"], axis=1)
     train=train.drop(["market_num"], axis=1)
+    valid=train[train['date']==Validation_date].index.item()
     train=train.drop(["date"], axis=1)
-    return train
+    return train,valid
 
 
 def buildTrain(train, pastDay, futureDay,type):
@@ -267,16 +270,29 @@ def splitData(X, Y, Z, rate):
     return X_train, Y_train, X_val, Y_val, Z_val
 
 
-def manageData(train,type,past,future):
-    train=train.convert_objects(convert_numeric=True)
-    temp = train
-    train = train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
-    train_x1, train_y1, train_z1,train_w1,mul_1 = buildTrain(train, past, future,type)
-    train_x2, train_y2, train_z2,train_w2,mul_2 = buildTrain(temp, past, future,type)
-    train_x, train_y, train_z ,train_w= train_x1, train_y2, train_z2,train_w1
-    train_x, train_y, train_z = shuffle(train_x, train_y, train_z)
-    train_x, train_y, val_x, val_y, val_z = splitData(train_x, train_y, train_z, 0.05)
-    return train_x, train_y,train_w, val_x, val_y, val_z,mul_2
+def manageData(train,type,past,future,Validation_date,valid,flag):
+    if flag==0:
+        train=train.convert_objects(convert_numeric=True)
+        temp = train
+        train = train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
+        train_x1, train_y1, train_z1,train_w1,mul_1 = buildTrain(train, past, future,type)
+        train_x2, train_y2, train_z2,train_w2,mul_2 = buildTrain(temp, past, future,type)
+        train_x, train_y, train_z ,train_w= train_x1, train_y2, train_z2,train_w1
+        train_x, train_y, train_z = shuffle(train_x, train_y, train_z)
+        train_x, train_y, val_x, val_y, val_z = splitData(train_x, train_y, train_z, 0.05)
+        return train_x, train_y,train_w, val_x, val_y, val_z,mul_2
+    else:
+        train=train.convert_objects(convert_numeric=True)
+        temp = train
+        train = train.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
+        train_x1, train_y1, train_z1,train_w1,mul_1 = buildTrain(train, past, future,type)
+        train_x2, train_y2, train_z2,train_w2,mul_2 = buildTrain(temp, past, future,type)
+        train_x, train_y, train_z ,train_w= train_x1, train_y2, train_z2,train_w1
+        train_x, train_y, train_z = shuffle(train_x, train_y, train_z)
+        train_x, train_y, val_x, val_y, val_z = splitData(train_x, train_y, train_z, 0.05)
+        valid_x=np.array(train.iloc[valid-future:valid])
+        valid_y=np.array(temp.iloc[valid:valid+future][type])
+        return train_x, train_y,train_w, val_x, val_y, val_z,mul_2,valid_x,valid_y
 
 
 def buildModel(train_x, train_y,future):
@@ -287,11 +303,11 @@ def buildModel(train_x, train_y,future):
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x,train_y, epochs=30, batch_size=32, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=100, batch_size=32, validation_split=0.1, callbacks=[callback])
     return model
 
 
-def getResult(model,train_w, val_x, val_y, val_z,mul,past,flag):
+def getResult(model,train_w, val_x, val_y, val_z,mul,past,valid_x,valid_y,flag):
     if flag==0:
         a = range(0, val_y.shape[0])
         val_y = val_y.reshape(-1)
@@ -332,4 +348,8 @@ def getResult(model,train_w, val_x, val_y, val_z,mul,past,flag):
         temp = temp.reshape(1, past, 21)
         z = model.predict(temp, verbose=0)
         z = z.reshape(-1)
-        return list(a), list(z*mul)
+        temp1=train_w
+        temp1=temp1.reshape(1, past, 21)
+        get = model.predict(temp1, verbose=0)
+        get = get.reshape(-1)
+        return list(a), list(z*mul),list(get*mul)

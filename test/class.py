@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[1]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-# In[4]:
+# In[2]:
 
 
 def readData(name):
@@ -60,7 +60,7 @@ def buildModel(train_x,train_y,bs):
     model.add(LSTM(32, input_length=train_x.shape[1],input_dim= train_x.shape[2],return_sequences=True))
     model.add(LSTM(32))
     model.add(Dense(1,kernel_initializer='uniform',activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam')
+    model.compile(loss='binary_crossentropy', optimizer='adam',metrics=['accuracy'])
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
     model.fit(train_x,train_y, epochs=1000, batch_size=bs, validation_split=0.1, callbacks=[callback])
@@ -77,7 +77,7 @@ place_name=["train+oil+weather+國定假日+拜拜日 雲林","train+oil+weather
 for i in place_name:
     df=pd.DataFrame(columns=col_name)
     data=[]
-    for j in range(30):
+    for j in range(5):
         train=readData(i)
         temp=train
         train=sta(train)
@@ -87,9 +87,9 @@ for i in place_name:
         train_x,train_y= shuffle(train_x,train_y)
         train_x,train_y, val_x, val_y= splitData(train_x,train_y, 0.05)
         model,layer=buildModel(train_x,train_y,batch_size)
-        pre=model.evaluate(val_x, val_y)
-        data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":lookback,"batch_size":batch_size,"name":i,"num":j})
-        print(pre)
+        pre=model.evaluate(val_x,val_y,verbose=0)
+        data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre[1]*100,"lookback":lookback,"batch_size":batch_size,"name":i,"num":j})
+        
     df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
     df.to_csv('class'+i+'_data'+'(lookback  '+str(lookback)+')'+'(bs  '+str(batch_size)+')'+'.csv', encoding='utf_8_sig')
 
