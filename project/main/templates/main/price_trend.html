@@ -47,8 +47,12 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div><h5>{{context.title}}</h5></div>
-            <div id="tester"></div>
+            <div><h5>{{context.title1}}</h5></div>
+            <div id="tester1"></div>
+            <p class='text-muted'><br />
+            <p class='text-muted'><br />
+            <div><h5>{{context.title2}}</h5></div>
+            <div id="tester2"></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
@@ -102,7 +106,7 @@
     <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
 
     <script>
-        TESTER = document.getElementById('tester');
+        TESTER1 = document.getElementById('tester1');
         var data =[
             {
                 x: {{context.a}},
@@ -114,7 +118,7 @@
                 x: {{context.a}},
                 y: {{context.d}},
                 type: 'lines',
-                name:'price_predict2'
+                name:'price_original'
             },
         ];
         var layout = {
@@ -123,7 +127,25 @@
             plot_bgcolor:"#ADD8E6",
             paper_bgcolor:"#F0F8FF"
         };
-        Plotly.newPlot(TESTER, data, layout);
+        Plotly.newPlot(TESTER1, data, layout);
+
+
+        TESTER2 = document.getElementById('tester2');
+        var data =[
+            {
+                x: {{context.a}},
+                y: {{context.b}},
+                type: 'lines',
+                name:'price_predict'
+            },
+        ];
+        var layout = {
+            width:750,
+            height:500,
+            plot_bgcolor:"#ADD8E6",
+            paper_bgcolor:"#F0F8FF"
+        };
+        Plotly.newPlot(TESTER2, data, layout);
     </script>
 
 </body>

@@ -98,8 +98,9 @@ def price_trend(request):
             train_x, train_y,train_w, val_x, val_y, val_z ,mul,valid_x,valid_y= manageData(data,'high',Predict_days,Predict_days,Validation_date,valid,1)
             model = buildModel(train_x, train_y,Predict_days)
             a, b,c= getResult(model,train_w, val_x, val_y, val_z,mul,Predict_days,valid_x,valid_y,1)
-            title = 'Price trend (in 30 days)'
-            context = {'title': title, 'a': a, 'b': b,'c':c,'d':list(valid_y)}
+            title1 = 'Show the model perfoemance - Predict price and original price (30 days from validation date)'
+            title2 = 'Price trend (in 30 days)'
+            context = {'title1': title1,'title2': title2, 'a': a, 'b': b,'c':c,'d':list(valid_y)}
         except:
             context = {"wrong": wrong}
     return render(request, "main/price_trend.html", locals())
