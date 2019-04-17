@@ -98,8 +98,8 @@ def price_trend(request):
             train_x, train_y,train_w, val_x, val_y, val_z ,mul,valid_x,valid_y= manageData(data,'high',Predict_days,Predict_days,Validation_date,valid,1)
             model = buildModel(train_x, train_y,Predict_days)
             a, b,c= getResult(model,train_w, val_x, val_y, val_z,mul,Predict_days,valid_x,valid_y,1)
-            title1 = 'Show the model perfoemance - Predict price and original price (30 days from validation date)'
-            title2 = 'Price trend (in 30 days)'
+            title1 = 'Show the model perfoemance - Predict price and original price (60 days from validation date)'
+            title2 = 'Price trend (in 60 days)'
             context = {'title1': title1,'title2': title2, 'a': a, 'b': b,'c':c,'d':list(valid_y)}
         except:
             context = {"wrong": wrong}
@@ -117,16 +117,19 @@ def price_trend_compare(request):
             W_station_name_2 = request.POST['Wstation name 2']
             W_station_num_2 = request.POST['Wstation num 2']
             Today_date = request.POST['Today date']
-            data = crawler(Crop_market_1, Crop_name, Crop_num,W_station_name_1,W_station_num_1,Today_date)
-            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',60,60)
-            model = buildModel(train_x, train_y,60)
-            a, b= getResult(model,train_w, val_x, val_y, val_z,mul,60,1)
-            data = crawler(Crop_market_2, Crop_name, Crop_num,W_station_name_2,W_station_num_2,Today_date)
-            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',60,60)
-            model = buildModel(train_x, train_y,60)
-            a, c= getResult(model,train_w, val_x, val_y, val_z,mul,60,1)
-            title = 'Price trend compare (in 60 days)'
-            context = {'title': title, 'a': a, 'b': b,'c':c}
+            Validation_date = request.POST['Validation date']
+            Predict_days = int(request.POST['Predict days'])
+            data,valid = crawler(Crop_market_1, Crop_name, Crop_num,W_station_name_1,W_station_num_1,Today_date,Validation_date)
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul,valid_x,valid_y1= manageData(data,'high',Predict_days,Predict_days,Validation_date,valid,1)
+            model = buildModel(train_x, train_y,Predict_days)
+            a, b,c= getResult(model,train_w, val_x, val_y, val_z,mul,Predict_days,valid_x,valid_y1,1)
+            data ,valid= crawler(Crop_market_2, Crop_name, Crop_num,W_station_name_2,W_station_num_2,Today_date,Validation_date)
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul,valid_x,valid_y2= manageData(data,'high',Predict_days,Predict_days,Validation_date,valid,1)
+            model = buildModel(train_x, train_y,Predict_days)
+            a, d,e= getResult(model,train_w, val_x, val_y, val_z,mul,Predict_days,valid_x,valid_y2,1)
+            title1 = 'Show the model perfoemance - Predict price and original price (60 days from validation date)'
+            title2 = 'Price trend (in 60 days)'
+            context = {'title1': title1,'title2': title2, 'a': a, 'b': b,'c':c,'d':d,'e':e,'f':list(valid_y1),'g':list(valid_y2)}
         except:
             context = {"wrong": wrong}
     return render(request, "main/price_trend_compare.html", locals())
@@ -304,7 +307,7 @@ def buildModel(train_x, train_y,future):
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x,train_y, epochs=100, batch_size=32, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=1, batch_size=500, validation_split=0.1, callbacks=[callback])
     return model
 
 
