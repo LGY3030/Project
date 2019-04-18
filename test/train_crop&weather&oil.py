@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import pandas as pd
@@ -74,14 +74,14 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name,num):
     totalss = 0
     for i in range(0,val_x.shape[0]):
         temp=val_x[i]
-        temp=temp.reshape(1,x,27)
+        temp=temp.reshape(1,x,28)
         z=int(model.predict(temp, verbose=0))
         if val_y[i]>=val_z[i] and z>=val_z[i]:
             co=co+1
         if val_y[i]<val_z[i] and z<val_z[i]:
             co=co+1
         if val_y[i] >= z:
-            sub = val_y[i]l - z
+            sub = val_y[i] - z
         if val_y[i] < z:
             sub = z - val_y[i]
         b.append(z)
@@ -105,12 +105,12 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name,num):
 lookbacks=[30,60,90,120]
 batch_size=32
 col_name=["1","2","3","4","5","acc","lookback","batch_size","name","StandardDeviation","AverageDeviation","num"]
-place_name=["train+oil+weather+國定假日+拜拜日 雲林","train+oil+weather+國定假日+拜拜日 嘉義","train+oil+weather+國定假日+拜拜日 彰化","train+oil+weather+國定假日+拜拜日 台南","train+oil+weather+國定假日+拜拜日 高雄","train+oil+weather+國定假日+拜拜日 屏東","train+oil+weather+國定假日+拜拜日 台中","train+oil+weather+國定假日+拜拜日 苗栗","train+oil+weather+國定假日+拜拜日 桃園","train+oil+weather+國定假日+拜拜日 台北"]
+place_name=["train+oil+weather+國定假日+拜拜日+高麗菜trend 雲林","train+oil+weather+國定假日+拜拜日+高麗菜trend 嘉義","train+oil+weather+國定假日+拜拜日+高麗菜trend 彰化","train+oil+weather+國定假日+拜拜日+高麗菜trend 台南","train+oil+weather+國定假日+拜拜日+高麗菜trend 高雄","train+oil+weather+國定假日+拜拜日+高麗菜trend 屏東","train+oil+weather+國定假日+拜拜日+高麗菜trend 台中","train+oil+weather+國定假日+拜拜日+高麗菜trend 苗栗","train+oil+weather+國定假日+拜拜日+高麗菜trend 桃園","train+oil+weather+國定假日+拜拜日+高麗菜trend 台北"]
 for lookback in lookbacks:
     for i in place_name:
         df=pd.DataFrame(columns=col_name)
         data=[]
-        for j in range(30):
+        for j in range(5):
             train=readData(i)
             temp=train
             train=sta(train)
