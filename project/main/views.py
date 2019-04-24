@@ -49,7 +49,7 @@ def price(request):
             W_station_num = request.POST['Wstation num']
             Today_date = request.POST['Today date']
             data ,valid= crawler(Crop_market, Crop_name, Crop_num,W_station_name,W_station_num,Today_date,"2012-01-01")
-            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',7,"2012-01-01",valid,0)
+            train_x, train_y,train_w, val_x, val_y, val_z ,mul= manageData(data,'high',7,1,"2012-01-01",valid,0)
             model = buildModel(train_x, train_y,1)
             result, average, ss, a, b, c = getResult(model,train_w, val_x, val_y, val_z,mul,7,0,0,0)
             title = 'Original price & Price predicted by model'
@@ -127,8 +127,8 @@ def price_trend_compare(request):
             train_x, train_y,train_w, val_x, val_y, val_z ,mul,valid_x,valid_y2= manageData(data,'high',Predict_days,Predict_days,Validation_date,valid,1)
             model = buildModel(train_x, train_y,Predict_days)
             a, d,e= getResult(model,train_w, val_x, val_y, val_z,mul,Predict_days,valid_x,valid_y2,1)
-            title1 = 'Show the model perfoemance - Predict price and original price (60 days from validation date)'
-            title2 = 'Price trend (in 60 days)'
+            title1 = 'Show the model perfoemance - Predict price and original price (30 days from validation date)'
+            title2 = 'Price trend (in 30 days)'
             context = {'title1': title1,'title2': title2, 'a': a, 'b': b,'c':c,'d':d,'e':e,'f':list(valid_y1),'g':list(valid_y2)}
         except:
             context = {"wrong": wrong}
@@ -307,7 +307,7 @@ def buildModel(train_x, train_y,future):
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(train_x,train_y, epochs=1, batch_size=500, validation_split=0.1, callbacks=[callback])
+    model.fit(train_x,train_y, epochs=300, batch_size=64, validation_split=0.1, callbacks=[callback])
     return model
 
 
@@ -352,8 +352,10 @@ def getResult(model,train_w, val_x, val_y, val_z,mul,past,valid_x,valid_y,flag):
         temp = temp.reshape(1, past, 21)
         z = model.predict(temp, verbose=0)
         z = z.reshape(-1)
+        z=np.absolute(z)
         temp1=train_w
         temp1=temp1.reshape(1, past, 21)
         get = model.predict(temp1, verbose=0)
         get = get.reshape(-1)
+        get=np.absolute(get)
         return list(a), list(z*mul),list(get*mul)
