@@ -16,7 +16,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
-# In[4]:
+# In[2]:
 
 
 def readData(name):
@@ -74,7 +74,7 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name,num):
     totalss = 0
     for i in range(0,val_x.shape[0]):
         temp=val_x[i]
-        temp=temp.reshape(1,x,77)
+        temp=temp.reshape(1,x,145)
         z=int(model.predict(temp, verbose=0))
         if val_y[i]>=val_z[i] and z>=val_z[i]:
             co=co+1
@@ -94,23 +94,25 @@ def predict(model,layer,val_x,val_y,val_z,x,y,name,num):
         totalss = totalss + i * i
     StandardDeviation=float((totalss / len(c))**0.5)
     AverageDeviation=sum(c)/len(c)
+    coefficientofvariation=StandardDeviation/AverageDeviation
     plt.savefig('img/'+name+'('+str(num)+')'+str(layer[0])+'+'+str(layer[1])+'+'+str(layer[2])+'+'+str(layer[3])+'+'+str(layer[4])+'+'+'ac,'+str(acc)+"%"+'+'+'lb,'+str(x)+'+'+'bs,'+str(y)+'.jpg')
     plt.clf()
-    return str(acc),StandardDeviation,AverageDeviation
+    return str(acc),StandardDeviation,AverageDeviation,coefficientofvariation
 
 
 # In[ ]:
 
 
-lookbacks=[7]
+lookbacks=[7,30,60,90,180,360]
 batch_size=32
-col_name=["1","2","3","4","5","acc","lookback","batch_size","name","StandardDeviation","AverageDeviation","num"]
+col_name=["1","2","3","4","5","acc","lookback","batch_size","name","StandardDeviation","AverageDeviation","coefficientofvariation","num"]
 place_name=["根莖類+train+oil台中weather+國定假日+拜拜日","根莖類+train+oil台北weather+國定假日+拜拜日","根莖類+train+oil台南weather+國定假日+拜拜日","根莖類+train+oil屏東weather+國定假日+拜拜日","根莖類+train+oil苗栗weather+國定假日+拜拜日","根莖類+train+oil桃園weather+國定假日+拜拜日","根莖類+train+oil高雄weather+國定假日+拜拜日","根莖類+train+oil雲林weather+國定假日+拜拜日","根莖類+train+oil嘉義weather+國定假日+拜拜日","根莖類+train+oil彰化weather+國定假日+拜拜日"]
-for i in place_name:
+place=["train+oil+全weather+國定假日+拜拜日+文旦trend"]
+for i in place:
     for lookback in lookbacks:
         df=pd.DataFrame(columns=col_name)
         data=[]
-        for j in range(20):
+        for j in range(30):
             train=readData(i)
             temp=train
             train=sta(train)
@@ -120,8 +122,8 @@ for i in place_name:
             train_x,train_y,train_z= shuffle(train_x,train_y,train_z)
             train_x,train_y, val_x, val_y ,val_z= splitData(train_x,train_y,train_z, 0.05)
             model,layer=buildModel(train_x,train_y,batch_size)
-            pre,StandardDeviation,AverageDeviation=predict(model,layer,val_x,val_y,val_z,lookback,batch_size,i,j)
-            data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":lookback,"batch_size":batch_size,"name":i,"StandardDeviation":StandardDeviation,"AverageDeviation":AverageDeviation,"num":j})
+            pre,StandardDeviation,AverageDeviation,coefficientofvariation=predict(model,layer,val_x,val_y,val_z,lookback,batch_size,i,j)
+            data.append({"1":layer[0],"2":layer[1],"3":layer[2],"4":layer[3],"5":layer[4],"acc":pre,"lookback":lookback,"batch_size":batch_size,"name":i,"StandardDeviation":StandardDeviation,"AverageDeviation":AverageDeviation,"coefficientofvariation":coefficientofvariation,"num":j})
         df=pd.concat([pd.DataFrame(data), df], ignore_index=True,sort=True)
         df.to_csv(i+'_data'+'(lookback  '+str(lookback)+')'+'(bs  '+str(batch_size)+')'+'.csv', encoding='utf_8_sig')
 

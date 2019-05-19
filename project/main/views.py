@@ -38,6 +38,18 @@ def home(request):
     context = {'posts': posts}
     return render(request, 'main/home.html', context)
 
+def Information(request):
+    if request.method == "POST":
+        Crop_market = request.POST['Crop market']
+        Crop_name = request.POST['Crop name']
+        data=pd.read_csv(r"C:\Users\admin\Desktop\train\data\蔬果\\"+Crop_market+"\\"+Crop_name+".csv")
+        data=data.drop(["Unnamed: 0"], axis=1)
+        data=data.drop(["day"], axis=1)
+        data=data.drop(["month"], axis=1)
+        data=data.drop(["year"], axis=1)
+        data=data.drop(["dayofweek"], axis=1)
+        html_table = data.to_html(index=False)
+    return render(request, 'main/Information.html',locals())
 
 def price(request):
     if request.method == "POST":
