@@ -12,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Volume page</title>
+    <title>Volume Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -51,24 +51,39 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div><h2>{{context.price_title}}</h2></div>
-            <div><h4>{{context.result}}</h4></div>
+            <div><h2>預測明日交易量:</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_predict_graph.jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
+            <div><h4>預測交易量: {{context.result}}</h4></div>
             <p style="padding: 0.75cm">
-            <div><h2>{{context.bi_title}}</h2></div>
+            <div><h2>訓練模型使用的資料筆數:</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_training_graph.jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
             <div><h4>{{context.bi_info1}} {{context.data_bi}} {{context.unit1}}</h4></div>
             <div><h4>{{context.bi_info2}} {{context.data_bi_rest}} {{context.unit1}}</h4></div>
             <p style="padding: 0.75cm">
-            <div><h2>{{context.graph_title}}</h2></div>
+            <div><h2>測試資料的預測交易量&測試資料的原始交易量:</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_test_graph.jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
             <div id="tester"></div>
             <p style="padding: 0.75cm">
-            <div><h2>{{context.accuracy_title}}</h2></div>
+            <div><h2>測試資料的預測資訊(所有測試資料):</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_test_data.jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
             <div><h4>{{context.accuracy_info1}} {{context.test_bi}} {{context.unit1}}</h4></div>
             <div><h4>{{context.accuracy_info2}} {{context.accuracy}} {{context.unit3}}</h4></div>
             <div><h4>{{context.accuracy_info3}} {{context.average_deviation}}</h4></div>
             <div><h4>{{context.accuracy_info4}} {{context.standard_deviation}}</h4></div>
             <div><h4>{{context.accuracy_info5}} {{context.coefficient_of_variation}}</h4></div>
             <p style="padding: 0.75cm">
-            <div><h2>{{context.accuracy_0_title}}</h2></div>
+            <div><h2>測試資料的預測資訊(扣除休市日的資料):</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_test_data_0.jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
             <div><h4>{{context.accuracy_info1}} {{context.test_bi_0}} {{context.unit1}}</h4></div>
             <div><h4>{{context.accuracy_info2}} {{context.accuracy_0}} {{context.unit3}}</h4></div>
             <div><h4>{{context.accuracy_info3}} {{context.average_deviation_0}}</h4></div>

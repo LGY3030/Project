@@ -9,4 +9,5 @@ urlpatterns = [
     path('volume/', views.volume, name='main_volume'),
     path('price_trend/', views.price_trend, name='main_price_trend'),
     path('price_trend_compare/', views.price_trend_compare, name='main_price_trend_compare'),
+    path('mistake/', views.mistake, name='main_mistake'),
 ]

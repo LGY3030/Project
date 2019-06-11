@@ -2,9 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-      h2 {background-color:lightyellow; color:white; column-span: all}
-    </style>
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,9 +10,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Recommendation page</title>
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <title>Mistake Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -53,44 +49,19 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div><h2>{{context.recommend_title}}</h2></div>
-            <div><h4>{{context.crop_market}} {{context.result}}</h4></div>
-            <div><h4>{{context.ano_crop_market}} {{context.ano_result}}</h4></div>
-            <p style="padding: 0.1cm">
-            <div><h4>{{context.crop_market}} {{context.recommendate}} {{context.ano_crop_market}}</h4></div>
-        </div>
-        <div class="col-md-4">
-          <div class="content-section">
-            <h3>Information Block</h3>
-            <p class='text-muted'>You should put information here.
-              <ul class="list-group">
-                <form action="/main/recommendation/" method="POST" name="form1">
-                {% csrf_token %}
-                  <p class='text-muted'>
-                  <p class='text-muted'>Crop market:
-                  <input type="text" name="Crop market">
-                  <p class='text-muted'>Crop name:
-                  <input type="text" name="Crop name">
-                  <p class='text-muted'>
-                  <input type="submit" value="Predict">
-                  <p class='text-muted'><br />
-                  <p class='text-muted'><h5>Sample input</h5>
-                  <p class='text-muted'>Crop market: 台北一
-                  <p class='text-muted'>Crop name: 香蕉
-
-                </form>
-              </ul>
-            </p>
-          </div>
+            <h4>{{ context.message }}</h4>
         </div>
       </div>
     </main>
+
+
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+
 </body>
 </html>

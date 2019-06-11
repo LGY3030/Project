@@ -2,7 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+    <style>
+      h2 {background-color:lightyellow; color:white; column-span: all}
+    </style>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -10,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Price trend page</title>
+    <title>Price Trend Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -49,12 +51,44 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div><h5>{{context.title1}}</h5></div>
-            <div id="tester1"></div>
-            <p class='text-muted'><br />
-            <p class='text-muted'><br />
-            <div><h5>{{context.title2}}</h5></div>
-            <div id="tester2"></div>
+            <div><h2>預測未來30天價格:</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_predict_graph(30).jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
+            <div id="tester_1"></div>
+            <p style="padding: 0.75cm">
+            <div><h2>訓練模型使用的資料筆數:</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_training_graph(30).jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
+            <div><h4>{{context.bi_info1}} {{context.data_bi}} {{context.unit1}}</h4></div>
+            <div><h4>{{context.bi_info2}} {{context.data_bi_rest}} {{context.unit1}}</h4></div>
+            <p style="padding: 0.75cm">
+            <div><h2>測試資料的預測價格&測試資料的原始價格:</h2></div>
+            <div id="tester_2"></div>
+            <p style="padding: 0.75cm">
+            <div><h2>測試資料的預測價格&測試資料的原始價格:</h2></div>
+            <div id="tester_3"></div>
+            <p style="padding: 0.75cm">
+            <div><h2>測試資料的預測資訊(所有測試資料):</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_test_data(30).jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
+            <div><h4>{{context.accuracy_info1}} {{context.test_bi}} {{context.unit1}}</h4></div>
+            <div><h4>{{context.accuracy_info2}} {{context.accuracy}} {{context.unit3}}</h4></div>
+            <div><h4>{{context.accuracy_info3}} {{context.average_deviation}} {{context.unit2}}</h4></div>
+            <div><h4>{{context.accuracy_info4}} {{context.standard_deviation}}</h4></div>
+            <div><h4>{{context.accuracy_info5}} {{context.coefficient_of_variation}}</h4></div>
+            <p style="padding: 0.75cm">
+            <div><h2>測試資料的預測資訊(扣除休市日的資料):</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_test_data_0(30).jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
+            <div><h4>{{context.accuracy_info1}} {{context.test_bi_0}} {{context.unit1}}</h4></div>
+            <div><h4>{{context.accuracy_info2}} {{context.accuracy_0}} {{context.unit3}}</h4></div>
+            <div><h4>{{context.accuracy_info3}} {{context.average_deviation_0}} {{context.unit2}}</h4></div>
+            <div><h4>{{context.accuracy_info4}} {{context.standard_deviation_0}}</h4></div>
+            <div><h4>{{context.accuracy_info5}} {{context.coefficient_of_variation_0}}</h4></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
@@ -68,30 +102,13 @@
                   <input type="text" name="Crop market">
                   <p class='text-muted'>Crop name:
                   <input type="text" name="Crop name">
-                  <p class='text-muted'>Crop num:
-                  <input type="text" name="Crop num">
-                  <p class='text-muted'>Wstation name:
-                  <input type="text" name="Wstation name">
-                  <p class='text-muted'>Wstation num:
-                  <input type="text" name="Wstation num">
-                  <p class='text-muted'>Today date:
-                  <input type="text" name="Today date"><br />
-                  <p class='text-muted'>Validation date:
-                  <input type="text" name="Validation date"><br />
-                  <p class='text-muted'>Predict days:
-                  <input type="text" name="Predict days"><br />
                   <p class='text-muted'>
                   <input type="submit" value="Predict">
                   <p class='text-muted'><br />
                   <p class='text-muted'><h5>Sample input</h5>
                   <p class='text-muted'>Crop market: 台北一
-                  <p class='text-muted'>Crop name: 甘藍-初秋
-                  <p class='text-muted'>Crop num: LA1
-                  <p class='text-muted'>Wstation name: 鞍部
-                  <p class='text-muted'>Wstation num: 466910
-                  <p class='text-muted'>Today date: 2019-04-06
-                  <p class='text-muted'>Validation date: 2018-04-06
-                  <p class='text-muted'>Predict days: 60
+                  <p class='text-muted'>Crop name: 香蕉
+
                 </form>
               </ul>
             </p>
@@ -108,35 +125,11 @@
     <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
 
     <script>
-        TESTER1 = document.getElementById('tester1');
+        TESTER = document.getElementById('tester_1');
         var data =[
             {
-                x: {{context.a}},
-                y: {{context.c}},
-                type: 'lines',
-                name:'price_predict'
-            },
-            {
-                x: {{context.a}},
-                y: {{context.d}},
-                type: 'lines',
-                name:'price_original'
-            },
-        ];
-        var layout = {
-            width:750,
-            height:500,
-            plot_bgcolor:"#ADD8E6",
-            paper_bgcolor:"#F0F8FF"
-        };
-        Plotly.newPlot(TESTER1, data, layout);
-
-
-        TESTER2 = document.getElementById('tester2');
-        var data =[
-            {
-                x: {{context.a}},
-                y: {{context.b}},
+                x: {{context.result_index}},
+                y: {{context.result}},
                 type: 'lines',
                 name:'price_predict'
             },
@@ -147,7 +140,55 @@
             plot_bgcolor:"#ADD8E6",
             paper_bgcolor:"#F0F8FF"
         };
-        Plotly.newPlot(TESTER2, data, layout);
+        Plotly.newPlot(TESTER, data, layout);
+    </script>
+    <script>
+        TESTER = document.getElementById('tester_2');
+        var data =[
+            {
+                x: {{context.graph_1_index}},
+                y: {{context.predict_graph_1}},
+                type: 'lines',
+                name:'price_predict'
+            },
+            {
+                x: {{context.graph_1_index}},
+                y: {{context.origin_graph_1}},
+                type: 'lines',
+                name:'price_origin'
+            }
+        ];
+        var layout = {
+            width:750,
+            height:500,
+            plot_bgcolor:"#ADD8E6",
+            paper_bgcolor:"#F0F8FF"
+        };
+        Plotly.newPlot(TESTER, data, layout);
+    </script>
+    <script>
+        TESTER = document.getElementById('tester_3');
+        var data =[
+            {
+                x: {{context.graph_2_index}},
+                y: {{context.predict_graph_2}},
+                type: 'lines',
+                name:'price_predict'
+            },
+            {
+                x: {{context.graph_2_index}},
+                y: {{context.origin_graph_2}},
+                type: 'lines',
+                name:'price_origin'
+            }
+        ];
+        var layout = {
+            width:750,
+            height:500,
+            plot_bgcolor:"#ADD8E6",
+            paper_bgcolor:"#F0F8FF"
+        };
+        Plotly.newPlot(TESTER, data, layout);
     </script>
 
 </body>

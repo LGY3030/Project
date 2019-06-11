@@ -12,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Home page</title>
+    <title>Home Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -54,7 +54,12 @@
         </div>
         <div class="col-md-10">
             <h2 style="font-weight: bold; text-align:center;">簡介</h2>
-            <h6>本網站提供蔬果的價格預測。能夠預測隔天的蔬果價格、蔬果買賣推薦、供應量、蔬果未來趨勢預測，並將預測結果、圖表以及模型預測的表現數值呈現。此外，也能夠查詢蔬果的原始資訊圖表。本網站主要提供給農民、蔬果商或ㄧ般民眾未來可能的蔬果資訊。</h6>
+            <p style="padding: 0.05cm">
+            <h6>  由於農民種植農作，多數只能交予傳統批發市場，在資訊不對稱的情況下，會面臨任運銷、批發商宰割的情況，而且農民在種植農作前，不能準確預測收成時的價格，不知當下相同農作的種植規模是否已超過市場需求，再加上對於未來收入沒有確定感的情況下，無法投入資金、設備，改良施作方法，惡性循環下無法面對競爭。因此希望藉由蔬果價格預測系統預測隔日價菜漲跌、決解資訊不對稱、幫助菜農瞭解市場需求以及降低不安全感。</h6>
+            <p style="padding: 0.05cm">
+            <h6>  本網站利用Python撰寫每日爬蟲的程式碼，抓取行政院農業委員會的農產品資訊和其他網站之相關資料，將取得的資訊做前處理和儲存。同時建立並實作LSTM神經網路，將預處理過的資料放入LSTM 的model訓練，儲存訓練過後的model以及相關分析資訊。</h6>
+            <p style="padding: 0.05cm">
+            <h6>  此外，實作Django 網站框架，讓使用者能夠操作並看到顯示的結果。此網站提供蔬果的價格預測。能夠預測隔天的蔬果價格、蔬果買賣推薦、供應量、蔬果未來趨勢預測，並將預測結果、圖表以及模型預測的表現數值呈現。此外，也能夠查詢蔬果的原始資訊圖表。主要提供給農民、蔬果商或ㄧ般民眾未來可能的蔬果資訊。</h6>
             <p style="padding: 0.75cm">
         </div>
       </div>
@@ -63,6 +68,7 @@
         </div>
         <div class="col-md-10">
             <h2 style="font-weight: bold; text-align:center;">可查詢之蔬果資訊</h2>
+            <p style="padding: 0.05cm">
             <h4>市場:</h4>
             <h6>台北一, 台北二, 板橋區, 三重區, 桃農, 台中, 豐原, 東勢, 嘉義, 高雄, 鳳山區, 台東, 宜蘭, 南投</h6>
             <p style="padding: 0.1cm">
@@ -95,8 +101,16 @@
             <h5>4. Volume: </h5>
             <h6>可以取得隔天蔬果的預測供應量，以及由 '測試資料的原始供應量' 與 '測試資料的預測供應量' 繪製的的折線圖表。此外，還有模型預測供應量的準確度、預測供應量與原始供應量的平均差和標準差等等。</h6>
             <p style="padding: 0.05cm">
+            <img src="{%static 'main/img/volume.jpg' %}" width=900 height=500/>
+            <p style="padding: 0.75cm">
             <h5>5. Price trend: </h5>
-            <h6>You can get the line chart with a price trend that is predicted from test data. Besides, you can obtain the predicted trend information of agricultural products such as price,average deviation,standard deviation etc..</h6>
+            <h6>可以取得未來30天蔬果的價格趨勢圖，'測試資料的原始價格' 與 '測試資料的預測價格' 繪製的的折線圖表，以及測試資料中 預測 與 原始 趨勢的折線圖表。此外，還有模型預測價格的準確度、預測價格與原始價格的平均差和標準差等等。</h6>
+            <img src="{%static 'main/img/price(30).jpg' %}" width=900 height=500/>
+            <p style="padding: 0.75cm">
+            <h5>6. Price trend compare: </h5>
+            <h6>可以取得兩市場未來30天蔬果的價格趨勢圖</h6>
+            <p style="padding: 0.05cm">
+            <img src="{%static 'main/img/price_compare(30).jpg' %}" width=900 height=500/>
         </div>
       </div>
 

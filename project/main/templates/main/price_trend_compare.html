@@ -2,7 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+    <style>
+      h2 {background-color:lightyellow; color:white; column-span: all}
+    </style>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -10,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Price trend page</title>
+    <title>Price Trend Compare Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -49,12 +51,8 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div><h5>{{context.title1}}</h5></div>
-            <div id="tester1"></div>
-            <p class='text-muted'><br />
-            <p class='text-muted'><br />
-            <div><h5>{{context.title2}}</h5></div>
-            <div id="tester2"></div>
+            <div><h2>{{context.price_title}}</h2></div>
+            <div id="tester"></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
@@ -70,37 +68,14 @@
                   <input type="text" name="Crop market 2">
                   <p class='text-muted'>Crop name:
                   <input type="text" name="Crop name">
-                  <p class='text-muted'>Crop num:
-                  <input type="text" name="Crop num">
-                  <p class='text-muted'>Wstation name 1:
-                  <input type="text" name="Wstation name 1">
-                  <p class='text-muted'>Wstation num 1:
-                  <input type="text" name="Wstation num 1">
-                  <p class='text-muted'>Wstation name 2:
-                  <input type="text" name="Wstation name 2">
-                  <p class='text-muted'>Wstation num 2:
-                  <input type="text" name="Wstation num 2">
-                  <p class='text-muted'>Today date:
-                  <input type="text" name="Today date"><br />
-                  <p class='text-muted'>Validation date:
-                  <input type="text" name="Validation date"><br />
-                  <p class='text-muted'>Predict days:
-                  <input type="text" name="Predict days"><br />
                   <p class='text-muted'>
                   <input type="submit" value="Predict">
                   <p class='text-muted'><br />
                   <p class='text-muted'><h5>Sample input</h5>
                   <p class='text-muted'>Crop market 1: 台北一
                   <p class='text-muted'>Crop market 2: 台北二
-                  <p class='text-muted'>Crop name: 甘藍-初秋
-                  <p class='text-muted'>Crop num: LA1
-                  <p class='text-muted'>Wstation name 1: 鞍部
-                  <p class='text-muted'>Wstation num 1: 466910
-                  <p class='text-muted'>Wstation name 2: 臺南
-                  <p class='text-muted'>Wstation num 2: 467410
-                  <p class='text-muted'>Today date: 2019-04-06
-                  <p class='text-muted'>Validation date: 2018-04-06
-                  <p class='text-muted'>Predict days: 60
+                  <p class='text-muted'>Crop name: 香蕉
+
                 </form>
               </ul>
             </p>
@@ -117,32 +92,20 @@
     <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
 
     <script>
-        TESTER1 = document.getElementById('tester1');
+        TESTER = document.getElementById('tester');
         var data =[
             {
-                x: {{context.a}},
-                y: {{context.c}},
+                x: {{context.result_index}},
+                y: {{context.result_1}},
                 type: 'lines',
-                name:'market_1_price_predict'
+                name:'price_predict'
             },
             {
-                x: {{context.a}},
-                y: {{context.f}},
+                x: {{context.result_index}},
+                y: {{context.result_2}},
                 type: 'lines',
-                name:'market_1_price_original'
-            },
-            {
-                x: {{context.a}},
-                y: {{context.e}},
-                type: 'lines',
-                name:'market_2_price_predict'
-            },
-            {
-                x: {{context.a}},
-                y: {{context.g}},
-                type: 'lines',
-                name:'market_2_price_original'
-            },
+                name:'price_origin'
+            }
         ];
         var layout = {
             width:750,
@@ -150,31 +113,7 @@
             plot_bgcolor:"#ADD8E6",
             paper_bgcolor:"#F0F8FF"
         };
-        Plotly.newPlot(TESTER1, data, layout);
-
-
-        TESTER2 = document.getElementById('tester2');
-        var data =[
-            {
-                x: {{context.a}},
-                y: {{context.b}},
-                type: 'lines',
-                name:'market_1_price_predict'
-            },
-            {
-                x: {{context.a}},
-                y: {{context.d}},
-                type: 'lines',
-                name:'market_2_price_predict'
-            },
-        ];
-        var layout = {
-            width:750,
-            height:500,
-            plot_bgcolor:"#ADD8E6",
-            paper_bgcolor:"#F0F8FF"
-        };
-        Plotly.newPlot(TESTER2, data, layout);
+        Plotly.newPlot(TESTER, data, layout);
     </script>
 
 </body>
