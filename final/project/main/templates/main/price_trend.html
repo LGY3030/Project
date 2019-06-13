@@ -12,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Price Page</title>
+    <title>Price Trend Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -53,26 +53,32 @@
         <div class="col-md-8">
             <div><h2>預測 {{context.price_title}} 價格:</h2></div>
             <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_predict_graph.jpg' %}" width=700 height=400/>
+            <img src="{%static 'main/img/data_predict_graph(30).jpg' %}" width=700 height=400/>
             <p style="padding: 0.1cm">
-            <div><h4>預測 {{context.price_title}} 價格: {{context.result}} {{context.unit2}}</h4></div>
+            <div id="tester_1"></div>
             <p style="padding: 0.75cm">
             <div><h2>訓練模型使用的資料筆數:</h2></div>
             <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_training_graph.jpg' %}" width=700 height=400/>
+            <img src="{%static 'main/img/data_training_graph(30).jpg' %}" width=700 height=400/>
             <p style="padding: 0.1cm">
             <div><h4>{{context.bi_info1}} {{context.data_bi}} {{context.unit1}}</h4></div>
             <div><h4>{{context.bi_info2}} {{context.data_bi_rest}} {{context.unit1}}</h4></div>
             <p style="padding: 0.75cm">
             <div><h2>測試資料的預測價格&測試資料的原始價格:</h2></div>
             <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_test_graph.jpg' %}" width=700 height=400/>
+            <img src="{%static 'main/img/data_test_graph(30).jpg' %}" width=700 height=400/>
             <p style="padding: 0.1cm">
-            <div id="tester"></div>
+            <div id="tester_2"></div>
+            <p style="padding: 0.75cm">
+            <div><h2>測試資料的預測價格&測試資料的原始價格:</h2></div>
+            <p style="padding: 0.1cm">
+            <img src="{%static 'main/img/data_test_graph_2(30).jpg' %}" width=700 height=400/>
+            <p style="padding: 0.1cm">
+            <div id="tester_3"></div>
             <p style="padding: 0.75cm">
             <div><h2>測試資料的預測資訊(所有測試資料):</h2></div>
             <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_test_data.jpg' %}" width=700 height=400/>
+            <img src="{%static 'main/img/data_test_data(30).jpg' %}" width=700 height=400/>
             <p style="padding: 0.1cm">
             <div><h4>{{context.accuracy_info1}} {{context.test_bi}} {{context.unit1}}</h4></div>
             <div><h4>{{context.accuracy_info2}} {{context.accuracy}} {{context.unit3}}</h4></div>
@@ -82,7 +88,7 @@
             <p style="padding: 0.75cm">
             <div><h2>測試資料的預測資訊(扣除休市日的資料):</h2></div>
             <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_test_data_0.jpg' %}" width=700 height=400/>
+            <img src="{%static 'main/img/data_test_data_0(30).jpg' %}" width=700 height=400/>
             <p style="padding: 0.1cm">
             <div><h4>{{context.accuracy_info1}} {{context.test_bi_0}} {{context.unit1}}</h4></div>
             <div><h4>{{context.accuracy_info2}} {{context.accuracy_0}} {{context.unit3}}</h4></div>
@@ -95,7 +101,7 @@
             <h3>Information Block</h3>
             <p class='text-muted'>You should put information here.
               <ul class="list-group">
-                <form action="/main/price/" method="POST" name="form1">
+                <form action="/main/price_trend/" method="POST" name="form1">
                 {% csrf_token %}
                   <p class='text-muted'>
                   <p class='text-muted'>Crop market:
@@ -125,17 +131,59 @@
     <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
 
     <script>
-        TESTER = document.getElementById('tester');
+        TESTER = document.getElementById('tester_1');
         var data =[
             {
-                x: {{context.graph_index}},
-                y: {{context.predict_graph}},
+                x: {{context.result_index}},
+                y: {{context.result}},
+                type: 'lines',
+                name:'price_predict'
+            },
+        ];
+        var layout = {
+            width:750,
+            height:500,
+            plot_bgcolor:"#ADD8E6",
+            paper_bgcolor:"#F0F8FF"
+        };
+        Plotly.newPlot(TESTER, data, layout);
+    </script>
+    <script>
+        TESTER = document.getElementById('tester_2');
+        var data =[
+            {
+                x: {{context.graph_1_index}},
+                y: {{context.predict_graph_1}},
                 type: 'lines',
                 name:'price_predict'
             },
             {
-                x: {{context.graph_index}},
-                y: {{context.origin_graph}},
+                x: {{context.graph_1_index}},
+                y: {{context.origin_graph_1}},
+                type: 'lines',
+                name:'price_origin'
+            }
+        ];
+        var layout = {
+            width:750,
+            height:500,
+            plot_bgcolor:"#ADD8E6",
+            paper_bgcolor:"#F0F8FF"
+        };
+        Plotly.newPlot(TESTER, data, layout);
+    </script>
+    <script>
+        TESTER = document.getElementById('tester_3');
+        var data =[
+            {
+                x: {{context.graph_2_index}},
+                y: {{context.predict_graph_2}},
+                type: 'lines',
+                name:'price_predict'
+            },
+            {
+                x: {{context.graph_2_index}},
+                y: {{context.origin_graph_2}},
                 type: 'lines',
                 name:'price_origin'
             }
@@ -151,7 +199,3 @@
 
 </body>
 </html>
-
-
-
-

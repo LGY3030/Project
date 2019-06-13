@@ -12,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'main/main.css' %}">
-    <title>Price Page</title>
+    <title>Price Trend Compare Page</title>
 <!--
     {% if title %}
         <title> Django web - {{title}}</title>
@@ -51,62 +51,29 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-            <div><h2>預測 {{context.price_title}} 價格:</h2></div>
-            <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_predict_graph.jpg' %}" width=700 height=400/>
-            <p style="padding: 0.1cm">
-            <div><h4>預測 {{context.price_title}} 價格: {{context.result}} {{context.unit2}}</h4></div>
-            <p style="padding: 0.75cm">
-            <div><h2>訓練模型使用的資料筆數:</h2></div>
-            <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_training_graph.jpg' %}" width=700 height=400/>
-            <p style="padding: 0.1cm">
-            <div><h4>{{context.bi_info1}} {{context.data_bi}} {{context.unit1}}</h4></div>
-            <div><h4>{{context.bi_info2}} {{context.data_bi_rest}} {{context.unit1}}</h4></div>
-            <p style="padding: 0.75cm">
-            <div><h2>測試資料的預測價格&測試資料的原始價格:</h2></div>
-            <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_test_graph.jpg' %}" width=700 height=400/>
-            <p style="padding: 0.1cm">
+            <div><h2>預測 {{context.price_title}} 兩市場價格:</h2></div>
             <div id="tester"></div>
-            <p style="padding: 0.75cm">
-            <div><h2>測試資料的預測資訊(所有測試資料):</h2></div>
-            <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_test_data.jpg' %}" width=700 height=400/>
-            <p style="padding: 0.1cm">
-            <div><h4>{{context.accuracy_info1}} {{context.test_bi}} {{context.unit1}}</h4></div>
-            <div><h4>{{context.accuracy_info2}} {{context.accuracy}} {{context.unit3}}</h4></div>
-            <div><h4>{{context.accuracy_info3}} {{context.average_deviation}} {{context.unit2}}</h4></div>
-            <div><h4>{{context.accuracy_info4}} {{context.standard_deviation}}</h4></div>
-            <div><h4>{{context.accuracy_info5}} {{context.coefficient_of_variation}}</h4></div>
-            <p style="padding: 0.75cm">
-            <div><h2>測試資料的預測資訊(扣除休市日的資料):</h2></div>
-            <p style="padding: 0.1cm">
-            <img src="{%static 'main/img/data_test_data_0.jpg' %}" width=700 height=400/>
-            <p style="padding: 0.1cm">
-            <div><h4>{{context.accuracy_info1}} {{context.test_bi_0}} {{context.unit1}}</h4></div>
-            <div><h4>{{context.accuracy_info2}} {{context.accuracy_0}} {{context.unit3}}</h4></div>
-            <div><h4>{{context.accuracy_info3}} {{context.average_deviation_0}} {{context.unit2}}</h4></div>
-            <div><h4>{{context.accuracy_info4}} {{context.standard_deviation_0}}</h4></div>
-            <div><h4>{{context.accuracy_info5}} {{context.coefficient_of_variation_0}}</h4></div>
         </div>
         <div class="col-md-4">
           <div class="content-section">
             <h3>Information Block</h3>
             <p class='text-muted'>You should put information here.
               <ul class="list-group">
-                <form action="/main/price/" method="POST" name="form1">
+                <form action="/main/price_trend_compare/" method="POST" name="form1">
                 {% csrf_token %}
                   <p class='text-muted'>
-                  <p class='text-muted'>Crop market:
-                  <input type="text" name="Crop market">
+                  <p class='text-muted'>Crop market 1:
+                  <input type="text" name="Crop market 1">
+                  <p class='text-muted'>Crop market 2:
+                  <input type="text" name="Crop market 2">
                   <p class='text-muted'>Crop name:
                   <input type="text" name="Crop name">
                   <p class='text-muted'>
                   <input type="submit" value="Predict">
                   <p class='text-muted'><br />
                   <p class='text-muted'><h5>Sample input</h5>
-                  <p class='text-muted'>Crop market: 台北一
+                  <p class='text-muted'>Crop market 1: 台北一
+                  <p class='text-muted'>Crop market 2: 台北二
                   <p class='text-muted'>Crop name: 香蕉
 
                 </form>
@@ -128,16 +95,16 @@
         TESTER = document.getElementById('tester');
         var data =[
             {
-                x: {{context.graph_index}},
-                y: {{context.predict_graph}},
+                x: {{context.result_index}},
+                y: {{context.result_1}},
                 type: 'lines',
-                name:'price_predict'
+                name:"market_1"
             },
             {
-                x: {{context.graph_index}},
-                y: {{context.origin_graph}},
+                x: {{context.result_index}},
+                y: {{context.result_2}},
                 type: 'lines',
-                name:'price_origin'
+                name:"market_2"
             }
         ];
         var layout = {
@@ -151,7 +118,3 @@
 
 </body>
 </html>
-
-
-
-
