@@ -15,7 +15,7 @@ filelock==3.0.12
 gast==0.2.2
 grpcio==1.21.1
 h5py==2.9.0
-html5lib==0.9999999
+html5lib==0.99999999
 idna==2.8
 importlib-metadata==0.17
 joblib==0.13.2
